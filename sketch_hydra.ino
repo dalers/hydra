@@ -11,6 +11,7 @@
 #include <SdFat.h>            // https://www.arduino.cc/reference/en/libraries/sdfat/
 #include <LiquidCrystal.h>    // https://www.arduino.cc/reference/en/libraries/liquidcrystal/
 #include <LCDKeypad.h>        // <https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield
+#include "RTClib.h"           // https://www.arduino.cc/reference/en/libraries/rtclib/
 
 
 // Initialize library objects
@@ -52,20 +53,21 @@ void setup() {
   sensor.postTransmission(postTransmission);
 
   Serial.begin(9600);
-  Serial.println("#Begins...");
+  Serial.println(F("#Starting..."));
+
+  if(sd.begin (chipSelect, SPI_HALF_SPEED)) {
+    Serial.println(F("SD Card OK"));
+  }
 
   lcd.begin(16, 2);
   lcd.clear();
-  lcd.print("Hydra Controller");
+  lcd.print(F("Hydra Controller"));
   lcd.setCursor(0,1);
-  lcd.print("Version 0.0.2");
+  lcd.print(F("Version 0.0.2"));
   delay(1000);
   lcd.setCursor(0,1);
-  lcd.print("Press R to Start");
+  lcd.print(F("Press R to Start"));
 
-  if(sd.begin (chipSelect, SPI_HALF_SPEED)) {
-    Serial.println("SD Card OK");
-  }
 }
 
 void loop() {
@@ -83,7 +85,7 @@ void loop() {
         uint8_t r = sensor.readInputRegisters(0, 3);
         
         if(0 != r) {
-          Serial.print("#SENSOR Read Error: ");
+          Serial.print(F("#SENSOR Read Error: "));
           Serial.println(r);
           //digitalWrite(LED1, LOW);    // display error code on LED1/2
           //digitalWrite(LED2, HIGH);
@@ -98,25 +100,23 @@ void loop() {
           
           if(moisture < 100 || moisture > 600) {
             Serial.println(moisture);
-            Serial.println("#SENSOR Moisture Out Of Bounds");
+            Serial.println(F("#SENSOR Moisture Out Of Bounds"));
             err = 1;
           }
   
           if(temperature < 150 || temperature > 350) {
             Serial.println(temperature);
-            Serial.println("#SENSOR Temperature Out Of Bounds");
+            Serial.println(F("#SENSOR Temperature Out Of Bounds"));
             err = 1;
           }
   
+          // deal with error
           if(err) {
-            //digitalWrite(LED1, LOW);      // display error code on LED1/LED2
-            //digitalWrite(LED2, HIGH);
-            delay(200);
+             // handle error
           } else {
-            //digitalWrite(LED1, HIGH);
-            //digitalWrite(LED2, LOW);
-            delay(50);
+             // all ok
           }
+
         }
       }
       
