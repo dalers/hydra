@@ -5,14 +5,17 @@
   (C) 2018 Albertas Mickėnas (Miceuz)
 */
 
+// built-in libraries
+// serial library             // https://www.arduino.cc/reference/en/language/functions/communication/serial/
+
+// included libraries
 #include <Bounce2.h>          // https://www.arduino.cc/reference/en/libraries/bounce2/
 #include <ModbusMaster.h>     // https://www.arduino.cc/reference/en/libraries/modbusmaster/
 #include <SoftwareSerial.h>   // https://docs.arduino.cc/learn/built-in-libraries/software-serial
 #include <SdFat.h>            // https://www.arduino.cc/reference/en/libraries/sdfat/
 #include <LiquidCrystal.h>    // https://www.arduino.cc/reference/en/libraries/liquidcrystal/
-#include <LCDKeypad.h>        // <https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield
+#include <LCDKeypad.h>        // https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield
 #include "RTClib.h"           // https://www.arduino.cc/reference/en/libraries/rtclib/
-
 
 // Initialize library objects
 SoftwareSerial softSerial(2, 3); // RX, TX
@@ -20,11 +23,12 @@ Bounce button = Bounce();
 ModbusMaster sensor;
 SdFat sd;
 LCDKeypad lcd;
+RTC_PCF8523 rtc;
 
 #define DRIVER_ENABLE A1            // RS-485 transceiver direction
 
 // SD Card
-const int chipSelect = A2;
+const int chipSelect = A2;          // TODO change to #define for consistency
 
 // ModbusMaster callback functions
 // enable driver before sending
@@ -48,23 +52,57 @@ void setup() {
   button.attach(A0);                // attach bounce object to A0 (RIGHT)
   button.interval(5);               // debounce time 5ms
 
-  sensor.begin(1, softSerial);                // setup comm with Modbus server Address 1
+  Serial.begin(9600);
+  Serial.println(F("#Starting"));
+
+  // LCD
+  lcd.begin(16, 2);
+  lcd.clear();
+  delay(1000);
+  
+  // SD Card
+  if(sd.begin (chipSelect, SPI_HALF_SPEED)) {
+    Serial.println(F("#SD found"));
+    //TODO output space available and file names
+  }
+
+  // RTC
+  if (rtc.begin()) {
+    Serial.println(F("#RTC found"));
+    
+    if (! rtc.initialized() || rtc.lostPower()) {
+      Serial.println(F("#RTC not initialized"));
+    } else {
+      DateTime now = rtc.now();
+      Serial.print(F("#RTC time "));
+      Serial.print(now.year(), DEC);
+      Serial.print(F("-"));
+      Serial.print(now.month(), DEC);
+      Serial.print(F("-"));
+      Serial.print(now.day(), DEC);
+      Serial.print(F("T"));
+      Serial.print(now.hour(), DEC);
+      Serial.print(F(":"));
+      Serial.print(now.minute(), DEC);
+      Serial.print(F(":"));
+      Serial.print(now.second(), DEC);
+      Serial.println();
+    }
+  } else {
+    Serial.println(F("#RTC not found"));
+  }
+
+  // Modbus
+  sensor.begin(1, softSerial);                // setup Modbus comms with Server Addr=1
   sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
   sensor.postTransmission(postTransmission);
 
-  Serial.begin(9600);
-  Serial.println(F("#Starting..."));
 
-  if(sd.begin (chipSelect, SPI_HALF_SPEED)) {
-    Serial.println(F("SD Card OK"));
-  }
-
-  lcd.begin(16, 2);
-  lcd.clear();
   lcd.print(F("Hydra Controller"));
   lcd.setCursor(0,1);
   lcd.print(F("Version 0.0.2"));
-  delay(1000);
+  delay(2000);
+  lcd.clear();
   lcd.setCursor(0,1);
   lcd.print(F("Press R to Start"));
 
