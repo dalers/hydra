@@ -58,12 +58,13 @@ void setup() {
   // LCD
   lcd.begin(16, 2);
   lcd.clear();
+  lcd.print(F("Starting..."));
   delay(1000);
   
   // SD Card
   if(sd.begin (chipSelect, SPI_HALF_SPEED)) {
     Serial.println(F("#SD found"));
-    //TODO output space available and file names
+    //TODO output file names and remaining space on SD Card
   }
 
   // RTC
@@ -93,11 +94,66 @@ void setup() {
   }
 
   // Modbus
-  sensor.begin(1, softSerial);                // setup Modbus comms with Server Addr=1
+  
+  uint8_t r;	// Modbus read status
+  
+  // Modbus Sensor 1
+  sensor.begin(1, softSerial);                // Modbus Server Addr=1
   sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
   sensor.postTransmission(postTransmission);
 
+  r = sensor.readInputRegisters(0, 3);
+  if (0 == r) {
+    Serial.print(F("#Sensor 1 found. Moisture: "));
+    Serial.print(sensor.getResponseBuffer(0));
+    Serial.print(F(", Temp: "));
+    Serial.println(sensor.getResponseBuffer(1));
+  } else {
+    Serial.println(F("#Sensor 1 NOT found"));
+  }
+	delay(1000);
+    
+  // Modbus Sensor 2
+  sensor.begin(2, softSerial);                // Modbus Server Addr=2
+  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
+  sensor.postTransmission(postTransmission);
 
+  r = sensor.readInputRegisters(0, 3);
+  if (0 == r) {
+    Serial.print(F("#Sensor 2 found. Moisture: "));
+    Serial.print(sensor.getResponseBuffer(0));
+    Serial.print(F(", Temp: "));
+    Serial.println(sensor.getResponseBuffer(1));
+  } else {
+    Serial.println(F("#Sensor 2 NOT found"));
+  }
+  delay(1000);
+	  
+  // Modbus Sensor 3
+  sensor.begin(3, softSerial);                // Modbus Server Addr=1
+  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
+  sensor.postTransmission(postTransmission);
+
+  r = sensor.readInputRegisters(0, 3);
+  if (0 == r) {
+    Serial.print(F("#Sensor 3 found. Moisture: "));
+    Serial.print(sensor.getResponseBuffer(0));
+    Serial.print(F(", Temp: "));
+    Serial.println(sensor.getResponseBuffer(1));
+  } else {
+    Serial.println(F("#Sensor 3 NOT found"));
+  }
+  delay(1000);
+	  
+  // Set Modbus back to Sensor 1
+  sensor.begin(1, softSerial);                // Modbus Server Addr=1
+  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
+  sensor.postTransmission(postTransmission);
+  delay(1000);
+
+  // Start UI
+
+  lcd.clear();
   lcd.print(F("Hydra Controller"));
   lcd.setCursor(0,1);
   lcd.print(F("Version 0.0.2"));
