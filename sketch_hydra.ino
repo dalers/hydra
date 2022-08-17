@@ -58,6 +58,8 @@ void setup() {
   // LCD
   lcd.begin(16, 2);
   lcd.clear();
+  lcd.print(F("Hydra Controller"));
+  lcd.setCursor(0,1);
   lcd.print(F("Starting..."));
   delay(1000);
   
@@ -153,12 +155,9 @@ void setup() {
 
   // Start UI
 
-  lcd.clear();
-  lcd.print(F("Hydra Controller"));
   lcd.setCursor(0,1);
-  lcd.print(F("Version 0.0.2"));
+  lcd.print(F("Hydra v0.0.2"));
   delay(2000);
-  lcd.clear();
   lcd.setCursor(0,1);
   lcd.print(F("Press R to Start"));
 
