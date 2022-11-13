@@ -5,10 +5,12 @@
   (C) 2018 Albertas Mickėnas (Miceuz)
 */
 
-// built-in libraries
-// serial library             // https://www.arduino.cc/reference/en/language/functions/communication/serial/
+// ***********************************
+// LIBRARIES
+// ***********************************
 
-// included libraries
+// serial library             // (built-in) https://www.arduino.cc/reference/en/language/functions/communication/serial/
+
 #include <Bounce2.h>          // https://www.arduino.cc/reference/en/libraries/bounce2/
 #include <ModbusMaster.h>     // https://www.arduino.cc/reference/en/libraries/modbusmaster/
 #include <SoftwareSerial.h>   // https://docs.arduino.cc/learn/built-in-libraries/software-serial
@@ -17,13 +19,20 @@
 #include <LCDKeypad.h>        // https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield
 #include "RTClib.h"           // https://www.arduino.cc/reference/en/libraries/rtclib/
 
-// Initialize library objects
+// ***********************************
+// GLOBAL VARIABLES
+// ***********************************
+
 SoftwareSerial softSerial(2, 3); // RX, TX
 Bounce button = Bounce();
 ModbusMaster sensor;
 SdFat sd;
 LCDKeypad lcd;
 RTC_PCF8523 rtc;
+
+//Sd2Card card;
+//SdVolume volume;
+//SdFile root;
 
 #define DRIVER_ENABLE A1            // RS-485 transceiver direction
 
@@ -40,6 +49,10 @@ void preTransmission() {
 void postTransmission() {
   digitalWrite(DRIVER_ENABLE, LOW);
 }
+
+// ***********************************
+// SETUP
+// ***********************************
 
 void setup() {
   Serial.begin(9600);               // Console
@@ -163,7 +176,14 @@ void setup() {
 
 }
 
+// ***********************************
+// MAIN LOOP
+// ***********************************
+
 void loop() {
+
+  button.update();
+
   if(button.fell()) {   // if RIGHT has been pressed
     
       delay(100);
@@ -236,6 +256,4 @@ void loop() {
     //digitalWrite(LED1, LOW);
   }
   
-  button.update();
-
 }
