@@ -17,7 +17,7 @@
 #include <SdFat.h>            // https://www.arduino.cc/reference/en/libraries/sdfat/
 #include <LiquidCrystal.h>    // https://www.arduino.cc/reference/en/libraries/liquidcrystal/
 #include <LCDKeypad.h>        // https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield
-#include "RTClib.h"           // https://www.arduino.cc/reference/en/libraries/rtclib/
+#include <RTClib.h>           // https://www.arduino.cc/reference/en/libraries/rtclib/
 
 // ***********************************
 // GLOBALS
@@ -25,7 +25,7 @@
 
 #define DRIVER_ENABLE A1            // RS-485 transceiver direction
 
-SoftwareSerial softSerial(2, 3); // RX, TX
+SoftwareSerial softSerial(2, 3);    // RX, TX
 Bounce button = Bounce();
 ModbusMaster sensor;
 SdFat sd;
@@ -51,7 +51,7 @@ void postTransmission() {
   digitalWrite(DRIVER_ENABLE, LOW);
 }
 
-// Log Blinking (blink "*" in top right of LCD when logging is active)
+// Logging heartbeat (LCD blinks "*" top right when logging)
 int logBlink = LOW;             // logBlink character state
 long interval = 1000;           // logBlink interval (milliseconds)
 long previousMillis = 0;        // time that logBlink was last updated
@@ -63,7 +63,7 @@ long previousMillis = 0;        // time that logBlink was last updated
 
 void setup() {
   Serial.begin(9600);               // Console
-  softSerial.begin(19200);          // RS-485 (Moisture Sensor default)
+  softSerial.begin(19200);          // RS-485 (Moisture Sensors)
   
   pinMode(A0, INPUT_PULLUP);        // config A0 for start button (RIGHT on LCD Keypad)
 
@@ -85,13 +85,16 @@ void setup() {
   
   // SD Card
   if(sd.begin (chipSelect, SPI_HALF_SPEED)) {
-    Serial.println(F("#SD found"));
+    Serial.println(F("#SD Card found"));
     //TODO output file names and remaining space on SD Card
+  } else {
+    Serial.println(F("#SD Card not found"));
+    // TODO set flag if SD Card not found
   }
 
   // RTC
   if (rtc.begin()) {
-    Serial.println(F("#RTC found"));
+    Serial.println(F("#RTC OK"));
     
     if (! rtc.initialized() || rtc.lostPower()) {
       Serial.println(F("#RTC not initialized"));
@@ -113,31 +116,33 @@ void setup() {
     }
   } else {
     Serial.println(F("#RTC not found"));
+    // TODO set flag if RTC not found
   }
 
   // Modbus
   
   uint8_t r;	// Modbus read status
   
-  // test for Moisture Sensor 1
-  sensor.begin(1, softSerial);                // Modbus Server Addr=1
-  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
+  // Moisture Sensor 1
+  sensor.begin(1, softSerial);
+  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
   sensor.postTransmission(postTransmission);
 
   r = sensor.readInputRegisters(0, 3);
   if (0 == r) {
-    Serial.print(F("#Sensor 1 found. Moisture: "));
+    Serial.print(F("#Sensor 1 OK. Moisture: "));
     Serial.print(sensor.getResponseBuffer(0));
     Serial.print(F(", Temp: "));
     Serial.println(sensor.getResponseBuffer(1));
   } else {
     Serial.println(F("#Sensor 1 NOT found"));
+    // TODO set flag if sensor 1 not found
   }
 	delay(1000);
     
-  // test for Moisture Sensor 2
-  sensor.begin(2, softSerial);                // Modbus Server Addr=2
-  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
+  // Moisture Sensor 2
+  sensor.begin(2, softSerial);
+  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
   sensor.postTransmission(postTransmission);
 
   r = sensor.readInputRegisters(0, 3);
@@ -148,12 +153,13 @@ void setup() {
     Serial.println(sensor.getResponseBuffer(1));
   } else {
     Serial.println(F("#Sensor 2 NOT found"));
+    // TODO set flag if sensor 2 not found
   }
   delay(1000);
 	  
-  // test for Moisture Sensor 3
-  sensor.begin(3, softSerial);                // Modbus Server Addr=1
-  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
+  // Moisture Sensor 3
+  sensor.begin(3, softSerial);
+  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
   sensor.postTransmission(postTransmission);
 
   r = sensor.readInputRegisters(0, 3);
@@ -164,12 +170,13 @@ void setup() {
     Serial.println(sensor.getResponseBuffer(1));
   } else {
     Serial.println(F("#Sensor 3 NOT found"));
+    // TODO set flag if sensor 3 not found
   }
   delay(1000);
 	  
-  // Set Modbus back to Sensor 1
-  sensor.begin(1, softSerial);                // Modbus Server Addr=1
-  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
+  // Set Modbus ID back to Sensor 1
+  sensor.begin(1, softSerial);
+  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
   sensor.postTransmission(postTransmission);
   delay(1000);
 
