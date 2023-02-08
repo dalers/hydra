@@ -20,8 +20,10 @@
 #include "RTClib.h"           // https://www.arduino.cc/reference/en/libraries/rtclib/
 
 // ***********************************
-// GLOBAL VARIABLES
+// GLOBALS
 // ***********************************
+
+#define DRIVER_ENABLE A1            // RS-485 transceiver direction
 
 SoftwareSerial softSerial(2, 3); // RX, TX
 Bounce button = Bounce();
@@ -29,15 +31,14 @@ ModbusMaster sensor;
 SdFat sd;
 LCDKeypad lcd;
 RTC_PCF8523 rtc;
+bool logging = false;
 
 //Sd2Card card;
 //SdVolume volume;
 //SdFile root;
 
-#define DRIVER_ENABLE A1            // RS-485 transceiver direction
-
 // SD Card
-const int chipSelect = A2;          // TODO change to #define for consistency
+const int chipSelect = A2;          // TODO change to #define (same as DRIVER_ENABLE)
 
 // ModbusMaster callback functions
 // enable driver before sending
@@ -49,6 +50,12 @@ void preTransmission() {
 void postTransmission() {
   digitalWrite(DRIVER_ENABLE, LOW);
 }
+
+// Log Blinking (blink "*" in top right of LCD when logging is active)
+int logBlink = LOW;             // logBlink character state
+long interval = 1000;           // logBlink interval (milliseconds)
+long previousMillis = 0;        // time that logBlink was last updated
+
 
 // ***********************************
 // SETUP
@@ -68,7 +75,7 @@ void setup() {
   Serial.begin(9600);
   Serial.println(F("#Starting"));
 
-  // LCD
+  // show beginning of startup on LCD
   lcd.begin(16, 2);
   lcd.clear();
   lcd.print(F("Hydra Controller"));
@@ -112,7 +119,7 @@ void setup() {
   
   uint8_t r;	// Modbus read status
   
-  // Modbus Sensor 1
+  // test for Moisture Sensor 1
   sensor.begin(1, softSerial);                // Modbus Server Addr=1
   sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
   sensor.postTransmission(postTransmission);
@@ -128,7 +135,7 @@ void setup() {
   }
 	delay(1000);
     
-  // Modbus Sensor 2
+  // test for Moisture Sensor 2
   sensor.begin(2, softSerial);                // Modbus Server Addr=2
   sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
   sensor.postTransmission(postTransmission);
@@ -144,7 +151,7 @@ void setup() {
   }
   delay(1000);
 	  
-  // Modbus Sensor 3
+  // test for Moisture Sensor 3
   sensor.begin(3, softSerial);                // Modbus Server Addr=1
   sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF
   sensor.postTransmission(postTransmission);
@@ -166,13 +173,12 @@ void setup() {
   sensor.postTransmission(postTransmission);
   delay(1000);
 
-  // Start UI
-
+  // show startup complete on LCD
   lcd.setCursor(0,1);
   lcd.print(F("Hydra v0.0.2"));
   delay(2000);
   lcd.setCursor(0,1);
-  lcd.print(F("Press R to Start"));
+  lcd.print(F("Start Log - R"));
 
 }
 
@@ -185,6 +191,8 @@ void loop() {
   button.update();
 
   if(button.fell()) {   // if RIGHT has been pressed
+
+      logging = true;
     
       delay(100);
 
