@@ -88,16 +88,17 @@ void setup() {
     Serial.println(F("#SD Card found"));
     //TODO output file names and remaining space on SD Card
   } else {
-    Serial.println(F("#SD Card not found"));
+    Serial.println(F("#SD Card NOT found"));
     // TODO set flag if SD Card not found
   }
 
   // RTC
   if (rtc.begin()) {
-    Serial.println(F("#RTC OK"));
+    Serial.println(F("#RTC found"));
     
     if (! rtc.initialized() || rtc.lostPower()) {
-      Serial.println(F("#RTC not initialized"));
+      Serial.println(F("#RTC NOT initialized"));
+      // TODO manage RTC not initialized
     } else {
       DateTime now = rtc.now();
       Serial.print(F("#RTC time "));
@@ -115,7 +116,7 @@ void setup() {
       Serial.println();
     }
   } else {
-    Serial.println(F("#RTC not found"));
+    Serial.println(F("#RTC NOT found"));
     // TODO set flag if RTC not found
   }
 
@@ -130,7 +131,7 @@ void setup() {
 
   r = sensor.readInputRegisters(0, 3);
   if (0 == r) {
-    Serial.print(F("#Sensor 1 OK. Moisture: "));
+    Serial.print(F("#Sensor 1 found. Moisture: "));
     Serial.print(sensor.getResponseBuffer(0));
     Serial.print(F(", Temp: "));
     Serial.println(sensor.getResponseBuffer(1));
@@ -138,7 +139,7 @@ void setup() {
     Serial.println(F("#Sensor 1 NOT found"));
     // TODO set flag if sensor 1 not found
   }
-	delay(1000);
+  delay(1000);
     
   // Moisture Sensor 2
   sensor.begin(2, softSerial);
@@ -174,12 +175,6 @@ void setup() {
   }
   delay(1000);
 	  
-  // Set Modbus ID back to Sensor 1
-  sensor.begin(1, softSerial);
-  sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
-  sensor.postTransmission(postTransmission);
-  delay(1000);
-
   // show startup complete on LCD
   lcd.setCursor(0,1);
   lcd.print(F("Hydra v0.0.2"));
@@ -195,28 +190,114 @@ void setup() {
 
 void loop() {
 
+  // TODO handle if SD Card, RTC or sensors not found
+  
   button.update();
+  if(button.fell()) {             // if RIGHT was pressed and released
 
-  if(button.fell()) {   // if RIGHT has been pressed
-
-      logging = true;
+    logging = true;               // TODO remove if not used
     
-      delay(100);
+    delay(100);
 
-      uint8_t  tests = 0;           // clear previous test results
-      uint16_t moisture = 0;
-      int16_t  temperature = 0;
-      uint16_t ver = 0;
-      uint8_t  err = 0;
+    uint8_t  samples = 0;         // sample counter
+    uint16_t moisture = 0;        // sensor moisture value
+    int16_t  temperature = 0;     // sensor temperature value
+    uint8_t  r = 0;               // sensor return value
 
-      while(tests < 10 && err == 0) { // read 10 times without error?
+    uint16_t ver = 0;             // TODO delete if not used
+    uint8_t  err = 0;             // TODO delete if not used
+    
+    // Sample Sensor 1
+    sensor.begin(1, softSerial);
+    sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
+    sensor.postTransmission(postTransmission);
+
+    r = sensor.readInputRegisters(0, 2);
+    if (0 == r) {
+      moisture = sensor.getResponseBuffer(0);
+      temperature = sensor.getResponseBuffer(1);
+	  
+	  Serial.print(F("#Sensor 1 Moisture: "));
+      Serial.print(sensor.getResponseBuffer(0));
+      Serial.print(F(", Temp: "));
+      Serial.println(sensor.getResponseBuffer(1));
+
+      // TODO write all three sensors at once
+      // TODO generate filename based on date and time of day e.g. ddhhmmss.log KISS
+      File results = sd.open("results.txt", FILE_WRITE);
+      results.print(moisture);
+      results.print(",");
+      results.print(temperature);
+      results.close();
+    } else {
+    // TODO handle error if read failure
+    }
+    delay(1000);
+    
+    // Sample Sensor 2
+    sensor.begin(2, softSerial);
+    sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
+    sensor.postTransmission(postTransmission);
+
+    r = sensor.readInputRegisters(0, 2);
+    if (0 == r) {
+      moisture = sensor.getResponseBuffer(0);
+      temperature = sensor.getResponseBuffer(1);
+	  
+	  Serial.print(F("#Sensor 2 Moisture: "));
+      Serial.print(sensor.getResponseBuffer(0));
+      Serial.print(F(", Temp: "));
+      Serial.println(sensor.getResponseBuffer(1));
+
+      File results = sd.open("results.txt", FILE_WRITE);
+      results.print(moisture);
+      results.print(",");
+      results.print(temperature);
+      results.close();
+    } else {
+    // TODO handle error if read failure
+    }
+    delay(1000);
+	  
+    // Sample Sensor 3
+    sensor.begin(3, softSerial);
+    sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
+    sensor.postTransmission(postTransmission);
+
+    r = sensor.readInputRegisters(0, 2);
+    if (0 == r) {
+      moisture = sensor.getResponseBuffer(0);
+      temperature = sensor.getResponseBuffer(1);
+	  
+	  Serial.print(F("#Sensor 3 Moisture: "));
+      Serial.print(sensor.getResponseBuffer(0));
+      Serial.print(F(", Temp: "));
+      Serial.println(sensor.getResponseBuffer(1));
+
+      File results = sd.open("results.txt", FILE_WRITE);
+      results.print(moisture);
+      results.print(",");
+      results.println(temperature);              // add CRLF after Sensor 3
+      results.close();
+    } else {
+    // TODO handle error if read failure
+    }
+    delay(1000);
+
+	  
+    samples++;                                  // TODO show samples on LCD
+
+    delay(60000);                                // delay 1m = 60,000sec
+
+    // TODO replace delay with timer and add blinking logging LED
+
+#if 0
+      while(samples < 10 && err == 0) { // read 10 times without error?
         uint8_t r = sensor.readInputRegisters(0, 3);
         
         if(0 != r) {
           Serial.print(F("#SENSOR Read Error: "));
           Serial.println(r);
-          //digitalWrite(LED1, LOW);    // display error code on LED1/2
-          //digitalWrite(LED2, HIGH);
           delay(100);
           err = 1;
         } else {
@@ -224,7 +305,7 @@ void loop() {
           temperature = sensor.getResponseBuffer(1);
           ver = sensor.getResponseBuffer(2); // appears there are actually 3 input registers! (moisture, temperature and fw version)
           
-          tests++; // increment number of tests
+          samples++; // increment number of samples
           
           if(moisture < 100 || moisture > 600) {
             Serial.println(moisture);
@@ -244,7 +325,6 @@ void loop() {
           } else {
              // all ok
           }
-
         }
       }
       
@@ -258,17 +338,7 @@ void loop() {
         results.println(temperature);
         results.close();
       }
-      
-      while(LOW == button.read()){
-        button.update();
-      }
-    delay(100);
-    //digitalWrite(LED2, LOW);
-    //digitalWrite(LED1, LOW);
+#endif
 
-  } else if(button.rose()){
-    //digitalWrite(LED2, LOW);
-    //digitalWrite(LED1, LOW);
   }
-  
 }
