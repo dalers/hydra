@@ -344,8 +344,7 @@ void loop() {
 
     // TODO blink LCD logging indicator
 
-    // wait until time for next sample // TODO replace with timer
-    delay(5000);                                // wait 5sec
-    //delay(60000);                                // wait 1min TODO replace with timer
+    // wait until time for next sample           // TODO replace with timer
+    delay(60000);                                // 5000=5sec, 60000=1min, 300000=5min
   }
 }
