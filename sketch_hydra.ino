@@ -2,7 +2,7 @@
   Hydra Soil Moisture Sensor Logger
 
   (C) 2023 Dale Scott
-  (C) 2018 Albertas Mickėnas (Miceuz)
+
 */
 
 // ***********************************
