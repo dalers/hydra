@@ -1,7 +1,7 @@
 /*
   Hydra Soil Moisture Sensor Logger
 
-  (C) 2022 Dale Scott
+  (C) 2023 Dale Scott
   (C) 2018 Albertas Mickėnas (Miceuz)
 */
 
@@ -9,7 +9,7 @@
 // LIBRARIES
 // ***********************************
 
-// serial library             // (built-in) https://www.arduino.cc/reference/en/language/functions/communication/serial/
+// serial library (built-in)  // https://www.arduino.cc/reference/en/language/functions/communication/serial/
 
 #include <Bounce2.h>          // https://www.arduino.cc/reference/en/libraries/bounce2/
 #include <ModbusMaster.h>     // https://www.arduino.cc/reference/en/libraries/modbusmaster/
@@ -25,37 +25,34 @@
 
 #define DRIVER_ENABLE A1            // RS-485 transceiver direction
 
+bool logging = false;               // logging state - true if logging
+uint8_t samples = 1;                // sample counter
+
 SoftwareSerial softSerial(2, 3);    // RX, TX
 Bounce button = Bounce();
 ModbusMaster sensor;
 SdFat sd;
 LCDKeypad lcd;
 RTC_PCF8523 rtc;
-bool logging = false;
-
-//Sd2Card card;
-//SdVolume volume;
-//SdFile root;
 
 // SD Card
 const int chipSelect = A2;          // TODO change to #define (same as DRIVER_ENABLE)
 
 // ModbusMaster callback functions
-// enable driver before sending
+// enable RS-485 driver before sending
 void preTransmission() {
   digitalWrite(DRIVER_ENABLE, HIGH);
 }
 
-// disable driver after sending
+// disable RS-485 driver after sending
 void postTransmission() {
   digitalWrite(DRIVER_ENABLE, LOW);
 }
 
-// Logging heartbeat (LCD blinks "*" top right when logging)
+// TODO implement heartbeat blinking "*" in LCD top right when logging
 int logBlink = LOW;             // logBlink character state
 long interval = 1000;           // logBlink interval (milliseconds)
 long previousMillis = 0;        // time that logBlink was last updated
-
 
 // ***********************************
 // SETUP
@@ -63,27 +60,25 @@ long previousMillis = 0;        // time that logBlink was last updated
 
 void setup() {
   Serial.begin(9600);               // Console
+  Serial.println(F("#Starting"));   // output startup notice to serial port
+
   softSerial.begin(19200);          // RS-485 (Moisture Sensors)
   
-  pinMode(A0, INPUT_PULLUP);        // config A0 for start button (RIGHT on LCD Keypad)
+  pinMode(DRIVER_ENABLE, OUTPUT);   // RS-485 driver
 
-  pinMode(DRIVER_ENABLE, OUTPUT);
-
+  pinMode(A0, INPUT_PULLUP);        // config A0 for start button (LCD keypad "RIGHT" button)
   button.attach(A0);                // attach bounce object to A0 (RIGHT)
   button.interval(5);               // debounce time 5ms
 
-  Serial.begin(9600);
-  Serial.println(F("#Starting"));
-
-  // show beginning of startup on LCD
+  // show starting up on LCD
   lcd.begin(16, 2);
-  lcd.clear();
+  lcd.clear(); // sets cursor to (col 0, row 0)
   lcd.print(F("Hydra Controller"));
   lcd.setCursor(0,1);
-  lcd.print(F("Starting..."));
-  delay(1000);
+  lcd.print(F("FW 0.0.3"));
+  delay(2000);                      // wait 2sec to display
   
-  // SD Card
+  // Probe SD Card
   if(sd.begin (chipSelect, SPI_HALF_SPEED)) {
     Serial.println(F("#SD Card found"));
     //TODO output file names and remaining space on SD Card
@@ -92,7 +87,7 @@ void setup() {
     // TODO set flag if SD Card not found
   }
 
-  // RTC
+  // Probe RTC
   if (rtc.begin()) {
     Serial.println(F("#RTC found"));
     
@@ -120,7 +115,7 @@ void setup() {
     // TODO set flag if RTC not found
   }
 
-  // Modbus
+  // Probe Modbus Moisture Sensors
   
   uint8_t r;	// Modbus read status
   
@@ -139,7 +134,7 @@ void setup() {
     Serial.println(F("#Sensor 1 NOT found"));
     // TODO set flag if sensor 1 not found
   }
-  delay(1000);
+  delay(1000);                                 // wait 1sec before next poll
     
   // Moisture Sensor 2
   sensor.begin(2, softSerial);
@@ -156,7 +151,7 @@ void setup() {
     Serial.println(F("#Sensor 2 NOT found"));
     // TODO set flag if sensor 2 not found
   }
-  delay(1000);
+  delay(1000);                                 // wait 1sec before next poll
 	  
   // Moisture Sensor 3
   sensor.begin(3, softSerial);
@@ -173,14 +168,13 @@ void setup() {
     Serial.println(F("#Sensor 3 NOT found"));
     // TODO set flag if sensor 3 not found
   }
-  delay(1000);
+  delay(1000);                                 // wait 1sec before next poll TODO is this needed since next poll is a ways away?
 	  
-  // show startup complete on LCD
+  // startup complete, show logging prompt
   lcd.setCursor(0,1);
-  lcd.print(F("Hydra v0.0.2"));
-  delay(2000);
-  lcd.setCursor(0,1);
-  lcd.print(F("Start Log - R"));
+  lcd.print(F("Start Logging >R"));
+
+  Serial.println(F("#Startup Complete"));
 
 }
 
@@ -190,50 +184,106 @@ void setup() {
 
 void loop() {
 
-  // TODO handle if SD Card, RTC or sensors not found
+  // TODO handle if probe of RTC, SD Card, or sensors fails
   
   button.update();
   if(button.fell()) {             // if RIGHT was pressed and released
+    Serial.println(F("#RIGHT pressed"));
+  
+    logging = !(logging);
+    Serial.print(F("#Logging state: "));
+    Serial.println(logging);
 
-    logging = true;               // TODO remove if not used
+    if (logging == true) {
+      lcd.setCursor(0,1);
+      lcd.print(F("Stop Logging  >R"));
+	  // TODO generate log filename based on now datetime e.g. "ddhhmmss.log"
+    } else {
+      lcd.setCursor(0,1);
+      lcd.print(F("Start Logging >R"));
+    }
+  }
     
-    delay(100);
+  uint16_t moisture = 0;        // sensor moisture value
+  int16_t  temperature = 0;     // sensor temperature value
+  uint8_t  r = 0;               // sensor return value
 
-    uint8_t  samples = 0;         // sample counter
-    uint16_t moisture = 0;        // sensor moisture value
-    int16_t  temperature = 0;     // sensor temperature value
-    uint8_t  r = 0;               // sensor return value
+  uint8_t  err = 0;             // read error counter (per sample)
 
-    uint16_t ver = 0;             // TODO delete if not used
-    uint8_t  err = 0;             // TODO delete if not used
-    
+  if (logging) {
+
+    DateTime now = rtc.now();   // get current date/time
+
+    // output current date/time to serial port
+    // TODO create string for output to serial port and writing to log file
+    // - write 2 digit month/day, currently writes 1 digit if < 10!
+    Serial.print(now.year(), DEC);
+    Serial.print(F("-"));
+    Serial.print(now.month(), DEC);
+    Serial.print(F("-"));
+    Serial.print(now.day(), DEC);
+    Serial.print(F("T"));
+    Serial.print(now.hour(), DEC);
+    Serial.print(F(":"));
+    Serial.print(now.minute(), DEC);
+    Serial.print(F(":"));
+    Serial.print(now.second(), DEC);
+    Serial.print(F(","));
+	
+    // write current date/time to logfile
+    // TODO create string for output to serial port and writing to log file
+    // - write 2 digit month/day, currently writes 1 digit if < 10!
+    //File logfile = sd.open("results.txt", FILE_WRITE);
+    //logfile.print(now.year(), DEC);
+    //logfile.print(F("-"));
+    //logfile.print(now.month(), DEC);
+    //logfile.print(F("-"));
+    //logfile.print(now.day(), DEC);
+    //logfile.print(F("T"));
+    //logfile.print(now.hour(), DEC);
+    //logfile.print(F(":"));
+    //logfile.print(now.minute(), DEC);
+    //logfile.print(F(":"));
+    //logfile.print(now.second(), DEC);
+    //logfile.print(F(","));
+
+    // output sample index to serial port
+    Serial.print(samples);
+    Serial.print(F(","));
+
+    // write sample index to log file
+    //File logfile = sd.open("results.txt", FILE_WRITE);
+    //logfile.print(samples);
+    //logfile.print(F(","));
+	
     // Sample Sensor 1
     sensor.begin(1, softSerial);
     sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
     sensor.postTransmission(postTransmission);
+    delay(1000);
 
     r = sensor.readInputRegisters(0, 2);
     if (0 == r) {
       moisture = sensor.getResponseBuffer(0);
       temperature = sensor.getResponseBuffer(1);
-	  
-	  Serial.print(F("#Sensor 1 Moisture: "));
-      Serial.print(sensor.getResponseBuffer(0));
-      Serial.print(F(", Temp: "));
-      Serial.println(sensor.getResponseBuffer(1));
+		
+      Serial.print(moisture);
+      Serial.print(F(","));
+      Serial.print(temperature);
+      Serial.print(F(","));
 
-      // TODO write all three sensors at once
       // TODO generate filename based on date and time of day e.g. ddhhmmss.log KISS
-      File results = sd.open("results.txt", FILE_WRITE);
-      results.print(moisture);
-      results.print(",");
-      results.print(temperature);
-      results.close();
+      //File logfile = sd.open("results.txt", FILE_WRITE);
+      //logfile.print(moisture);
+      //logfile.print(F(","));
+      //logfile.print(temperature);
+      //logfile.print(F(","));
+      //logfile.close();
     } else {
-    // TODO handle error if read failure
+      // TODO write commas for null fields
     }
     delay(1000);
-    
+      
     // Sample Sensor 2
     sensor.begin(2, softSerial);
     sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
@@ -243,22 +293,24 @@ void loop() {
     if (0 == r) {
       moisture = sensor.getResponseBuffer(0);
       temperature = sensor.getResponseBuffer(1);
-	  
-	  Serial.print(F("#Sensor 2 Moisture: "));
-      Serial.print(sensor.getResponseBuffer(0));
-      Serial.print(F(", Temp: "));
-      Serial.println(sensor.getResponseBuffer(1));
+      
+      Serial.print(moisture);
+      Serial.print(F(","));
+      Serial.print(temperature);
+      Serial.print(F(","));
 
-      File results = sd.open("results.txt", FILE_WRITE);
-      results.print(moisture);
-      results.print(",");
-      results.print(temperature);
-      results.close();
+      // TODO use string variable for filename
+      //File logfile = sd.open("results.txt", FILE_WRITE);
+      //logfile.print(moisture);
+      //logfile.print(F(","));
+      //logfile.print(temperature);
+      //logfile.print(F(","));
+      //logfile.close();
     } else {
-    // TODO handle error if read failure
+      // TODO write commas for null fields
     }
     delay(1000);
-	  
+      
     // Sample Sensor 3
     sensor.begin(3, softSerial);
     sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
@@ -268,77 +320,27 @@ void loop() {
     if (0 == r) {
       moisture = sensor.getResponseBuffer(0);
       temperature = sensor.getResponseBuffer(1);
-	  
-	  Serial.print(F("#Sensor 3 Moisture: "));
-      Serial.print(sensor.getResponseBuffer(0));
-      Serial.print(F(", Temp: "));
-      Serial.println(sensor.getResponseBuffer(1));
-
-      File results = sd.open("results.txt", FILE_WRITE);
-      results.print(moisture);
-      results.print(",");
-      results.println(temperature);              // add CRLF after Sensor 3
-      results.close();
-    } else {
-    // TODO handle error if read failure
-    }
-    delay(1000);
-
-	  
-    samples++;                                  // TODO show samples on LCD
-
-    delay(60000);                                // delay 1m = 60,000sec
-
-    // TODO replace delay with timer and add blinking logging LED
-
-#if 0
-      while(samples < 10 && err == 0) { // read 10 times without error?
-        uint8_t r = sensor.readInputRegisters(0, 3);
-        
-        if(0 != r) {
-          Serial.print(F("#SENSOR Read Error: "));
-          Serial.println(r);
-          delay(100);
-          err = 1;
-        } else {
-          moisture = sensor.getResponseBuffer(0);
-          temperature = sensor.getResponseBuffer(1);
-          ver = sensor.getResponseBuffer(2); // appears there are actually 3 input registers! (moisture, temperature and fw version)
-          
-          samples++; // increment number of samples
-          
-          if(moisture < 100 || moisture > 600) {
-            Serial.println(moisture);
-            Serial.println(F("#SENSOR Moisture Out Of Bounds"));
-            err = 1;
-          }
-  
-          if(temperature < 150 || temperature > 350) {
-            Serial.println(temperature);
-            Serial.println(F("#SENSOR Temperature Out Of Bounds"));
-            err = 1;
-          }
-  
-          // deal with error
-          if(err) {
-             // handle error
-          } else {
-             // all ok
-          }
-        }
-      }
       
-      if(err == 0){
-        Serial.print(moisture);
-        Serial.print(", ");
-        Serial.println(temperature);
-        File results = sd.open("results.txt", FILE_WRITE);
-        results.print(moisture);
-        results.print(",");
-        results.println(temperature);
-        results.close();
-      }
-#endif
+      Serial.print(moisture);
+      Serial.print(F(","));
+      Serial.println(temperature);               // end of sample (3 sensors)
 
+      //TODO write all three sensors at once
+      //TODO generate filename based on date and time of day e.g. ddhhmmss.log KISS
+      //File logfile = sd.open("results.txt", FILE_WRITE);
+      //logfile.print(moisture);
+      //logfile.print(F(","));
+      //logfile.println(temperature);              // end of sample (3 sensors)
+      //logfile.close();
+    } else {
+      // TODO write commas for null fields if read failure
+    }
+    //delay(1000);                               // no delay needed due to delay before next sample
+
+    samples++;                                   // increment number of samples
+
+    // TODO blink LCD logging indicator
+    delay(5000);                                // wait 5sec = 10,000msec TODO replace with timer
+    //delay(60000);                                // wait 1min = 60,000msec TODO replace with timer
   }
 }
