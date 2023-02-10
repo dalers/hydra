@@ -13,6 +13,17 @@ The datalogger hardware consists of:
 
 ## Install Libraries
 
+Required libraries (...\Arduino\libraries):
+
+* Adafruit_BusIO/
+* Bounce2/
+* LCDKeypad/
+* LiquidCrystal/
+* ModbusMaster/
+* RTClib/
+* SdFat_-_Adafruit_Fork/
+
+
 ### RTClib
 
 RTClib is required to access the realtime clock chip on the Arduino Data Logger Shield.
@@ -22,6 +33,7 @@ RTClib is required to access the realtime clock chip on the Arduino Data Logger 
    IDE > Tools > Manage Libraries > Type: All, Topic: All, filter by "RTClib"
 
    > Install RTClib by Adafruit v2.0.2
+
 
 ### Bounce2
 
@@ -33,6 +45,7 @@ Bounce2 is used to debounce the pushbutton switches on the OSEPP 16x2 Text LCD &
 
    > Install Bounce2 by Thomas O Fredericks v2.71.2
 
+
 ### ModbusMaster
 
 ModbusMaster is used to access the Catnip RS485 (Modbus) moisture sensors.
@@ -43,6 +56,7 @@ ModbusMaster is used to access the Catnip RS485 (Modbus) moisture sensors.
 
    > Install ModbusMaster by Doc Walker 4-20mA@wvfans.net v2.0.1
 
+
 ### SdFat
 
 SdFat is used to access the SD Card on the Arduino Data Logger Shield.
@@ -52,6 +66,16 @@ SdFat is used to access the SD Card on the Arduino Data Logger Shield.
    IDE > Tools > Manage Libraries > Type: All, Topic: All, filter by "SdFat"
 
    > Install SdFat - Adafruit Fork v2.1.2
+
+
+### LiquidCrystal
+
+1. Install "Liquid Crystal by Arduino, Adafruit" (<https://www.arduino.cc/reference/en/libraries/liquidcrystal/>)
+
+   IDE > Tools > Manage Libraries > Type: All, Topic: All, filter by "lcd"
+
+   > Install LiquidCrystal by Arduino, Adafruit v1.0.7
+
 
 ### LCDKeypad Lib
 
