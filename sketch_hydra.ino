@@ -1,7 +1,7 @@
 /*
-  Hydra Soil Moisture Sensor Logger
-
+  Hydra Soil Moisture Sensor Data Logger
   (C) 2023 Dale Scott
+  Provided according to the terms of the GPL v3
 
 */
 
@@ -27,6 +27,7 @@
 
 bool logging = false;               // logging state - true if logging
 uint8_t samples = 1;                // sample counter
+uint8_t r;	                        // Modbus read status
 
 SoftwareSerial softSerial(2, 3);    // RX, TX
 Bounce button = Bounce();
@@ -49,7 +50,7 @@ void postTransmission() {
   digitalWrite(DRIVER_ENABLE, LOW);
 }
 
-// TODO implement heartbeat blinking "*" in LCD top right when logging
+// TODO implement logging heartbeat in LCD when logging (e.g. blink "*" top right)
 int logBlink = LOW;             // logBlink character state
 long interval = 1000;           // logBlink interval (milliseconds)
 long previousMillis = 0;        // time that logBlink was last updated
@@ -62,11 +63,10 @@ void setup() {
   Serial.begin(9600);               // Console
   Serial.println(F("#Starting"));   // output startup notice to serial port
 
-  softSerial.begin(19200);          // RS-485 (Moisture Sensors)
-  
-  pinMode(DRIVER_ENABLE, OUTPUT);   // RS-485 driver
+  softSerial.begin(19200);          // RS-485 software UART
+  pinMode(DRIVER_ENABLE, OUTPUT);   // RS-485 driver control
 
-  pinMode(A0, INPUT_PULLUP);        // config A0 for start button (LCD keypad "RIGHT" button)
+  pinMode(A0, INPUT_PULLUP);        // LCD keypad "RIGHT" button TODO why enable internal pullup? (will be in parallel with 3K on PCB)
   button.attach(A0);                // attach bounce object to A0 (RIGHT)
   button.interval(5);               // debounce time 5ms
 
@@ -76,17 +76,8 @@ void setup() {
   lcd.print(F("Hydra Controller"));
   lcd.setCursor(0,1);
   lcd.print(F("FW 0.0.3"));
-  delay(2000);                      // wait 2sec to display
+  delay(2000);                      // display fw version for 2+ seconds
   
-  // Probe SD Card
-  if(sd.begin (chipSelect, SPI_HALF_SPEED)) {
-    Serial.println(F("#SD Card found"));
-    //TODO output file names and remaining space on SD Card
-  } else {
-    Serial.println(F("#SD Card NOT found"));
-    // TODO set flag if SD Card not found
-  }
-
   // Probe RTC
   if (rtc.begin()) {
     Serial.println(F("#RTC found"));
@@ -115,11 +106,17 @@ void setup() {
     // TODO set flag if RTC not found
   }
 
-  // Probe Modbus Moisture Sensors
-  
-  uint8_t r;	// Modbus read status
-  
-  // Moisture Sensor 1
+  // Probe SD Card
+  if(sd.begin (chipSelect, SPI_HALF_SPEED)) {
+    Serial.println(F("#SD Card found"));
+    //TODO output file names and remaining space on SD Card
+  } else {
+    Serial.println(F("#SD Card NOT found"));
+    // TODO set flag if SD Card not found
+  }
+
+  // Probe Moisture Sensors
+  // Sensor 1
   sensor.begin(1, softSerial);
   sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
   sensor.postTransmission(postTransmission);
@@ -136,7 +133,7 @@ void setup() {
   }
   delay(1000);                                 // wait 1sec before next poll
     
-  // Moisture Sensor 2
+  // Sensor 2
   sensor.begin(2, softSerial);
   sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
   sensor.postTransmission(postTransmission);
@@ -153,7 +150,7 @@ void setup() {
   }
   delay(1000);                                 // wait 1sec before next poll
 	  
-  // Moisture Sensor 3
+  // Sensor 3
   sensor.begin(3, softSerial);
   sensor.preTransmission(preTransmission);    // toggle RS-485 driver ON/OFF (is this needed?)
   sensor.postTransmission(postTransmission);
@@ -191,13 +188,12 @@ void loop() {
     Serial.println(F("#RIGHT pressed"));
   
     logging = !(logging);
-    Serial.print(F("#Logging state: "));
-    Serial.println(logging);
+    Serial.print(F("#Logging state: ")); Serial.println(logging);
 
     if (logging == true) {
       lcd.setCursor(0,1);
       lcd.print(F("Stop Logging  >R"));
-	  // TODO generate log filename based on now datetime e.g. "ddhhmmss.log"
+	  // TODO generate log filename based on current date/time e.g. "ddhhmmss.log"
     } else {
       lcd.setCursor(0,1);
       lcd.print(F("Start Logging >R"));
@@ -230,31 +226,36 @@ void loop() {
     Serial.print(now.second(), DEC);
     Serial.print(F(","));
 	
+    // open logfile
+    File logfile = sd.open("logfile.txt", FILE_WRITE);
+    
     // write current date/time to logfile
     // TODO create string for output to serial port and writing to log file
     // - write 2 digit month/day, currently writes 1 digit if < 10!
-    //File logfile = sd.open("results.txt", FILE_WRITE);
-    //logfile.print(now.year(), DEC);
-    //logfile.print(F("-"));
-    //logfile.print(now.month(), DEC);
-    //logfile.print(F("-"));
-    //logfile.print(now.day(), DEC);
-    //logfile.print(F("T"));
-    //logfile.print(now.hour(), DEC);
-    //logfile.print(F(":"));
-    //logfile.print(now.minute(), DEC);
-    //logfile.print(F(":"));
-    //logfile.print(now.second(), DEC);
-    //logfile.print(F(","));
+    //File logfile = sd.open("logfile.txt", FILE_WRITE);
+    logfile.print(now.year(), DEC);
+    logfile.print(F("-"));
+    logfile.print(now.month(), DEC);
+    logfile.print(F("-"));
+    logfile.print(now.day(), DEC);
+    logfile.print(F("T"));
+    logfile.print(now.hour(), DEC);
+    logfile.print(F(":"));
+    logfile.print(now.minute(), DEC);
+    logfile.print(F(":"));
+    logfile.print(now.second(), DEC);
+    logfile.print(F(","));
+    //logfile.close();
 
     // output sample index to serial port
     Serial.print(samples);
     Serial.print(F(","));
 
     // write sample index to log file
-    //File logfile = sd.open("results.txt", FILE_WRITE);
-    //logfile.print(samples);
-    //logfile.print(F(","));
+    //File logfile = sd.open("logfile.txt", FILE_WRITE);
+    logfile.print(samples);
+    logfile.print(F(","));
+    //logfile.close();
 	
     // Sample Sensor 1
     sensor.begin(1, softSerial);
@@ -273,11 +274,11 @@ void loop() {
       Serial.print(F(","));
 
       // TODO generate filename based on date and time of day e.g. ddhhmmss.log KISS
-      //File logfile = sd.open("results.txt", FILE_WRITE);
-      //logfile.print(moisture);
-      //logfile.print(F(","));
-      //logfile.print(temperature);
-      //logfile.print(F(","));
+      //File logfile = sd.open("logfile.txt", FILE_WRITE);
+      logfile.print(moisture);
+      logfile.print(F(","));
+      logfile.print(temperature);
+      logfile.print(F(","));
       //logfile.close();
     } else {
       // TODO write commas for null fields
@@ -300,11 +301,11 @@ void loop() {
       Serial.print(F(","));
 
       // TODO use string variable for filename
-      //File logfile = sd.open("results.txt", FILE_WRITE);
-      //logfile.print(moisture);
-      //logfile.print(F(","));
-      //logfile.print(temperature);
-      //logfile.print(F(","));
+      //File logfile = sd.open("logfile.txt", FILE_WRITE);
+      logfile.print(moisture);
+      logfile.print(F(","));
+      logfile.print(temperature);
+      logfile.print(F(","));
       //logfile.close();
     } else {
       // TODO write commas for null fields
@@ -325,12 +326,11 @@ void loop() {
       Serial.print(F(","));
       Serial.println(temperature);               // end of sample (3 sensors)
 
-      //TODO write all three sensors at once
-      //TODO generate filename based on date and time of day e.g. ddhhmmss.log KISS
-      //File logfile = sd.open("results.txt", FILE_WRITE);
-      //logfile.print(moisture);
-      //logfile.print(F(","));
-      //logfile.println(temperature);              // end of sample (3 sensors)
+      // TODO generate filename based on date and time of day e.g. ddhhmmss.log KISS
+      //File logfile = sd.open("logfile.txt", FILE_WRITE);
+      logfile.print(moisture);
+      logfile.print(F(","));
+      logfile.println(temperature);              // end of sample (3 sensors)
       //logfile.close();
     } else {
       // TODO write commas for null fields if read failure
@@ -339,8 +339,13 @@ void loop() {
 
     samples++;                                   // increment number of samples
 
+    // close logfile
+    logfile.close();
+
     // TODO blink LCD logging indicator
-    delay(5000);                                // wait 5sec = 10,000msec TODO replace with timer
-    //delay(60000);                                // wait 1min = 60,000msec TODO replace with timer
+
+    // wait until time for next sample // TODO replace with timer
+    delay(5000);                                // wait 5sec
+    //delay(60000);                                // wait 1min TODO replace with timer
   }
 }
