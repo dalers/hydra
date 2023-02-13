@@ -189,7 +189,12 @@ void loop() {
     if (logging == true) {
       lcd.setCursor(0,1);
       lcd.print(F("Stop Logging  >R"));
-      // TODO generate log filename based on current date/time e.g. "ddhhmmss.log"
+      // write header to logfile
+      // TODO generate log filename using current date/time e.g. "ddhhmmss.csv"
+      File logfile = sd.open("logfile.csv", FILE_WRITE);
+      logfile.println(F("DateTime,ID,S1-M,S1-T,S2-M,S2-T,S3-M,S3-T"));
+      logfile.close();
+
     } else {
       lcd.setCursor(0,1);
       lcd.print(F("Start Logging >R"));
@@ -223,7 +228,7 @@ void loop() {
     Serial.print(F(","));
 	
     // open logfile to write new sample record
-    File logfile = sd.open("logfile.txt", FILE_WRITE);
+    File logfile = sd.open("logfile.csv", FILE_WRITE);
     
     // write current date/time to logfile
     // TODO write 2 digit month/day (currently writes 1 digit if < 10)
