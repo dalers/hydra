@@ -128,7 +128,7 @@ void setup() {
     Serial.println(F("#Sensor 1 NOT found"));
     // TODO set flag if sensor 1 not found
   }
-  delay(200);                                 // sensors need delay after last read
+  delay(200);                                 // sensors need delay before next read
     
   // Probe Moisture Sensor 2
   sensor.begin(2, softSerial);
@@ -145,7 +145,7 @@ void setup() {
     Serial.println(F("#Sensor 2 NOT found"));
     // TODO set flag if sensor 2 not found
   }
-  delay(200);                                 // sensors need delay after last read
+  delay(200);                                 // sensors need delay before next read
 	  
   // Probe Moisture Sensor 3
   sensor.begin(3, softSerial);
@@ -162,7 +162,7 @@ void setup() {
     Serial.println(F("#Sensor 3 NOT found"));
     // TODO set flag if sensor 3 not found
   }
-  delay(200);                                 // sensors need delay after last read (probably not needed here)
+  delay(200);                                 // sensors need delay before next read (probably not needed here)
 	  
   // startup complete, show logging prompt
   lcd.setCursor(0,1);
@@ -278,7 +278,7 @@ void loop() {
     } else {
       // TODO write null fields if read failure
     }
-    delay(200);                                 // sensors need delay after previous read
+    delay(200);                                 // sensors need delay before next read
       
     // Read Sensor 2
     sensor.begin(2, softSerial);
@@ -304,7 +304,7 @@ void loop() {
     } else {
       // TODO write null fields if read failure
     }
-    delay(200);                                 // sensors need delay after last read
+    delay(200);                                 // sensors need delay before next read
       
     // Read Sensor 3
     sensor.begin(3, softSerial);
