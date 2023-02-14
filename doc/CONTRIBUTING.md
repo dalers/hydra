@@ -12,7 +12,7 @@ by one of the following:
 * create an issue (for specific discussion)
 * email the repository owner (for preliminary discussion)
 
-It is often helpful to discuss your desired change even before starting to write
+It can be helpful to discuss your desired change even before starting to write
 code because others may have started development of a similar change, be able to
 suggest improvements or refinements based on their needs and or experience, or
 be willing to assist you in development.
