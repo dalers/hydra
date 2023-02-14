@@ -52,7 +52,7 @@ From the Arduino IDE, access menu Tools > Manage Libraries > Type: All, Topic: A
 
 #### LCDKeypad
 
-Download LCDKeypad.zip from <https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield>, and extract the LCDKeypad directory to \~/Arduino/libraries
+Download LCDKeypad.zip from <https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield>, and extract the LCDKeypad directory to \~/Arduino/libraries (in the "libraries" folder in your "Arduino Sketch Folder", where you will find the other libraries that have been installed).
 
 #### ModbusMaster
 
