@@ -1,19 +1,27 @@
-# **Hydra**
+## **Hydra**
 
-Hydra is an datalogger for Modbus moisture sensor data.
+Hydra is a soil moisture monitor and data logger.
 
-The datalogger hardware consists of:
+[Source License (2-Clause BSD)](doc/LICENSE.md)
+[Contribution Guidelines](doc/CONTRIBUTING.md)
+[Code of Conduct](doc/CODE_OF_CONDUCT.md)
 
-* Arduino Uno
-* Adafruit Data Logging Shield (includes RTC with battery-backup)
-* OSEPP 16x2 LCD Display and Keypad Shield
-* Waveshare 5V Serial to RS-485 Adapter
+Hydra hardware stack:
+
+  * Arduino Uno
+  * Adafruit Data Logging Shield (SD Card and RTC with battery-backup)
+  * OSEPP 16x2 LCD Display and Keypad Shield
+  * Waveshare 5V Serial to RS-485 Adapter
+  * Catnip Electronics Modbus RS485 Soil Moisture Sensor (x3)
+
+Refer to the [Hydra schematic](doc/Hydra-SCHEMATIC.pdf) for interconnection.
+
 
 # **Getting Started**
 
-## Install Libraries
+## Install Source Libraries
 
-Required libraries (...\Arduino\libraries):
+Hydra makes use of the following libraries:
 
 * Adafruit_BusIO/
 * Bounce2/
@@ -23,64 +31,48 @@ Required libraries (...\Arduino\libraries):
 * RTClib/
 * SdFat_-_Adafruit_Fork/
 
-
 ### RTClib
 
-RTClib is required to access the realtime clock chip on the Arduino Data Logger Shield.
+RTClib (<https://github.com/adafruit/RTClib>) provides access to the realtime clock chip on the Arduino Data Logger Shield.
 
-1. Install "RTClib" (<https://github.com/adafruit/RTClib>)
-
-   IDE > Tools > Manage Libraries > Type: All, Topic: All, filter by "RTClib"
-
-   > Install RTClib by Adafruit v2.0.2
-
+1. From the IDE, access menu: Tools > Manage Libraries > Type: All, Topic: All, filter by "RTClib", and install the latest version of "RTClib by Adafruit" (e.g. v2.0.2)
 
 ### Bounce2
 
-Bounce2 is used to debounce the pushbutton switches on the OSEPP 16x2 Text LCD & Keypad Shield.
+Bounce2 (<https://www.arduino.cc/reference/en/libraries/bounce2/>) provides software debounce of the pushbutton switches on the OSEPP 16x2 Text LCD & Keypad Shield.
 
-1. Install "Bounce2" (<https://www.arduino.cc/reference/en/libraries/bounce2/>)
-
-   IDE > Tools > Manage Libraries > Type: All, Topic: All, filter by "Bounce2"
-
-   > Install Bounce2 by Thomas O Fredericks v2.71.2
-
+1. From the IDE, access menu: Tools > Manage Libraries > Type: All, Topic: All, filter by "Bounce2", and install the latest version of Bounce2 by Thomas O Fredericks (e.g. v2.71.2)
 
 ### ModbusMaster
 
-ModbusMaster is used to access the Catnip RS485 (Modbus) moisture sensors.
+ModbusMaster (<https://www.arduino.cc/reference/en/libraries/modbusmaster/>) is the communication protocol stack to access to the Catnip RS485 Modbus Soil Moisture Sensors.
 
-1. Install "ModbusMaster" (<https://www.arduino.cc/reference/en/libraries/modbusmaster/>)
-
-   IDE > Tools > Manage Libraries > Type: All, Topic: All, filter by "ModbusMaster"
-
-   > Install ModbusMaster by Doc Walker 4-20mA@wvfans.net v2.0.1
-
+1. From the IDE, access menu: Tools > Manage Libraries > Type: All, Topic: All, filter by "ModbusMaster", and install the latest version of ModbusMaster by Doc Walker 4-20mA@wvfans.net (e.g. v2.0.1)
 
 ### SdFat
 
-SdFat is used to access the SD Card on the Arduino Data Logger Shield.
+SdFat (<https://www.arduino.cc/reference/en/libraries/sdfat/>) provides access to the SD Card on the Arduino Data Logger Shield.
 
-1. Install "SdFat - Adafruit Fork" (<https://www.arduino.cc/reference/en/libraries/sdfat/>)
-
-   IDE > Tools > Manage Libraries > Type: All, Topic: All, filter by "SdFat"
-
-   > Install SdFat - Adafruit Fork v2.1.2
-
+1. From the IDE, access menu: Tools > Manage Libraries > Type: All, Topic: All, filter by "SdFat", and install the latest version of SdFat - Adafruit Fork (e.g. v2.1.2)
 
 ### LiquidCrystal
 
-1. Install "Liquid Crystal by Arduino, Adafruit" (<https://www.arduino.cc/reference/en/libraries/liquidcrystal/>)
+LiquidCrystal (<https://www.arduino.cc/reference/en/libraries/liquidcrystal/>) provides low-level access to the LCD display on the OSEPP 16x2 Text LCD & Keypad Shield. **This library may already be installed with the Arduino IDE**
 
-   IDE > Tools > Manage Libraries > Type: All, Topic: All, filter by "lcd"
+1. From the Arduino IDE, access menu Tools > Manage Libraries > Type: All, Topic: All, filter by "lcd", and install the latest version of LiquidCrystal by Arduino, Adafruit (e.g. v1.0.7)
 
-   > Install LiquidCrystal by Arduino, Adafruit v1.0.7
+### LCDKeypad
 
+LCDKeypad provides an object oriented library for interaction with the pushbutton switches and LCD on the OSEPP 16x2 Text LCD & Keypad Shield.
 
-### LCDKeypad Lib
+1. Download LCDKeypad.zip from <https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield>, and extract the LCDKeypad directory to \~/Arduino/libraries
 
-LCDKeypad is used to access the pushbutton switches and LCD on the OSEPP 16x2 Text LCD & Keypad Shield (it encapsulates the standard LCD library for LCD access).
+## Usage
 
-1. Download LCDKeypad.zip from <https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield>
-2. Extract LCDKeypad\ from LCDKeypad.zip to \~/Arduino/libraries
+* Assemble the Hydra hardware stack following the [Hydra schematic](Doc/Hydra-Schematic-v2.1.pdf).
+* Format a 2GB SD Card with FAT32 and insert it into the Arduino Data Logger Shield.
+* Verify and upload the hydra sketch to the Arduino
+* Use the Serial Monitor in the IDE to verify correct startup
+* Press the ***RIGHT*** button on the LCD Display and Keypad Shield to start logging. Pressing ***RIGHT*** again will stop logging.
+* Disconnect power to the Arduino and move the SD Card to a PC to access the log file.
 
