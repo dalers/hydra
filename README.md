@@ -19,7 +19,11 @@ Refer to the [Hydra schematic](doc/Hydra-SCHEMATIC.pdf) for interconnection.
 
 ## Getting Started
 
-### Install Source Libraries
+### Install Arduino IDE 2
+
+Hydra is developed using the Arduino IDE (Arduino IDE v2 is recommended).
+
+### Install Libraries
 
 The following libraries must be installed to compile Hydra:
 
@@ -50,9 +54,9 @@ From the Arduino IDE, access menu: Tools > Manage Libraries > Type: All, Topic: 
 
 #### LiquidCrystal
 
-LiquidCrystal (<https://www.arduino.cc/reference/en/libraries/liquidcrystal/>) provides low-level access to the LCD display on the OSEPP 16x2 Text LCD & Keypad Shield. *This library may already have been installed with the Arduino IDE**
+LiquidCrystal (<https://www.arduino.cc/reference/en/libraries/liquidcrystal/>) provides low-level access to the LCD display on the OSEPP 16x2 Text LCD & Keypad Shield.
 
-From the Arduino IDE, access menu Tools > Manage Libraries > Type: All, Topic: All, filter by "lcd", and install the latest version of LiquidCrystal by Arduino, Adafruit (e.g. v1.0.7)
+From the Arduino IDE, access menu Tools > Manage Libraries > Type: All, Topic: All, filter by "lcd", and install the latest version of LiquidCrystal by Arduino, Adafruit (e.g. v1.0.7).
 
 #### LCDKeypad
 
