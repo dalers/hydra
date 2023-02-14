@@ -12,9 +12,9 @@ by one of the following:
 * create an issue (for specific discussion)
 * email the repository owner (for preliminary discussion)
 
-It is often helpful to discussing your desired change even before starting to write
-code. A similar change may already be in development, or there may be a superior solution
-based on a more thorough understanding of the code.
+It is often helpful to discuss your desired change even before starting to write
+code because a similar change may already be in development, or there may be a superior solution
+others more familiar with the source can offer.
 
 ## Pull Request Process
 
