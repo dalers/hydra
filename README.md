@@ -63,7 +63,7 @@ From the Arduino IDE, access menu: Tools > Manage Libraries > Type: All, Topic: 
 
 * Assemble the Hydra hardware stack following the [Hydra schematic](doc/Hydra-SCHEMATIC.pdf).
 * Format a 2GB SD Card with FAT32 and insert it in the Arduino Data Logger Shield.
-* Verify and upload the hydra sketch to the Arduino Uno R3.
+* Open the [Hydra sketch](hydra.ini) in the Arduino IDE, verify (compile) and upload to the Arduino Uno R3.
 * Use the Serial Monitor in the IDE to verify correct startup.
 * Press the **RIGHT** button on the LCD Display and Keypad Shield to start logging. Press **RIGHT** again to stop logging.
 * Disconnect power to the Arduino and move the SD Card to a PC to access the log file.
