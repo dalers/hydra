@@ -21,7 +21,7 @@ Refer to the [Hydra schematic](doc/Hydra-SCHEMATIC.pdf) for interconnection.
 
 ### Install Arduino IDE 2
 
-Hydra is developed using the Arduino IDE (Arduino IDE v2 is recommended).
+Install [Arduino IDE v2](https://wiki-content.arduino.cc/en/software).
 
 ### Install Libraries
 
