@@ -13,9 +13,9 @@ by one of the following:
 * email the repository owner (for preliminary discussion)
 
 It is often helpful to discuss your desired change even before starting to write
-code because others may be considering or have even started development of a similar
-change, be able to suggest improvements or refinements to your proposal based on
-their needs and experience, or be able to assist you in development.
+code because others may have started development of a similar change, be able to
+suggest improvements or refinements based on their needs and or experience, or
+be willing to assist you in development.
 
 ## Pull Request Process
 
