@@ -21,7 +21,7 @@ Refer to the [Hydra schematic](doc/Hydra-SCHEMATIC.pdf) for interconnection.
 
 ### Install Arduino IDE 2
 
-Install [Arduino IDE v2](https://wiki-content.arduino.cc/en/software).
+For developing Hydra and programming the Arduino Uno, install the latest version of [Arduino IDE v2](https://wiki-content.arduino.cc/en/software).
 
 ### Install Libraries
 
