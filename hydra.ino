@@ -1,7 +1,7 @@
 /*
   Hydra Soil Moisture Sensor Data Logger
   (C) 2023 Dale Scott
-  License GPL v3
+  License 2-Clause BSD
 
 */
 
@@ -29,7 +29,7 @@ bool logging = false;               // logging state - true if logging
 uint16_t samples = 1;               // sample counter, uint16_t = 45d @ 1min sample period
 uint8_t r;	                        // Modbus read status
 
-SoftwareSerial softSerial(2, 3);    // RX, TX
+SoftwareSerial softSerial(2, 3);    // Pin 2 = RX, Pin 3 = TX
 Bounce button = Bounce();
 ModbusMaster sensor;
 SdFat sd;
