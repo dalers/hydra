@@ -8,11 +8,11 @@ Hydra is a soil moisture monitor and data logger.
 
 Hydra Hardware Stack:
 
-  * Arduino Uno
-  * Adafruit Data Logging Shield (SD Card and RTC with battery-backup)
-  * OSEPP 16x2 LCD Display and Keypad Shield
-  * Waveshare 5V Serial to RS-485 Adapter
-  * Catnip Electronics Modbus RS485 Soil Moisture Sensor (x3)
+  * [Arduino Uno R3](https://store.arduino.cc/products/arduino-uno-rev3)
+  * [Adafruit Data Logging Shield](https://www.adafruit.com/product/1141)
+  * [OSEPP 16x2 LCD Display and Keypad Shield](https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield)
+  * [Waveshare 5V Serial to RS-485 Adapter](https://www.waveshare.com/rs485-board-5v.htm)
+  * [Catnip Electronics Modbus RS485 Soil Moisture Sensor](https://www.tindie.com/products/miceuz/modbus-rs485-soil-moisture-sensor-2/)
 
 Refer to the [Hydra schematic](doc/Hydra-SCHEMATIC.pdf) for interconnection.
 
