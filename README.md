@@ -16,6 +16,7 @@ Hydra Hardware Stack:
 
 Refer to the [Hydra schematic](doc/Hydra-SCHEMATIC.pdf) for interconnection.
 
+Hydra is currently hard-coded for three moisture sensors, which must be pre-configured to have Modbus ID 1, 2 and 3.
 
 ## Getting Started
 
