@@ -28,11 +28,11 @@ Hydra is developed using the Arduino IDE (Arduino IDE v2 is recommended).
 Hydra uses the following third-party libraries:
 
 * [RTClib](https://github.com/adafruit/RTClib) is used to access to the realtime clock (RTC) on the Arduino Data Logger Shield.
-* [SdFat - Adafruit_Fork](https://www.arduino.cc/reference/en/libraries/sdfat) provides access to the SD Card on the Arduino Data Logger Shield.
-* [Bounce2](https://www.arduino.cc/reference/en/libraries/bounce2) provides is used to debounce the pushbutton switches on the OSEPP 16x2 Text LCD & Keypad Shield.
-* [LiquidCrystal](https://www.arduino.cc/reference/en/libraries/liquidcrystal) provides low-level access to the LCD display on the OSEPP 16x2 Text LCD & Keypad Shield.
-* [LCDKeypad](https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield) provides an object oriented wrapper to interact with the pushbutton switches and LCD on the OSEPP 16x2 Text LCD & Keypad Shield.
-* [ModbusMaster](https://www.arduino.cc/reference/en/libraries/modbusmaster) provides the Modbus communication protocol stack to polling the Catnip RS485 Modbus Soil Moisture Sensors.
+* [SdFat - Adafruit_Fork](https://www.arduino.cc/reference/en/libraries/sdfat) is used to access the SD Card on the Arduino Data Logger Shield.
+* [Bounce2](https://www.arduino.cc/reference/en/libraries/bounce2) is used to debounce the pushbutton switches on the OSEPP 16x2 Text LCD & Keypad Shield.
+* [LiquidCrystal](https://www.arduino.cc/reference/en/libraries/liquidcrystal) is the low-level interface to the LCD display on the OSEPP 16x2 Text LCD & Keypad Shield.
+* [LCDKeypad](https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield) is an object-oriented interface to the pushbutton switches and LCD on the OSEPP 16x2 Text LCD & Keypad Shield.
+* [ModbusMaster](https://www.arduino.cc/reference/en/libraries/modbusmaster) is the Modbus communication protocol stack for polling the Catnip RS485 Modbus Soil Moisture Sensors.
 
 #### RTClib
 
