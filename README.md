@@ -34,7 +34,7 @@ The following libraries must be installed to compile Hydra:
 
 RTClib (<https://github.com/adafruit/RTClib>) provides access to the realtime clock chip on the Arduino Data Logger Shield.
 
-* From the Arduino IDE, access menu: Tools > Manage Libraries > Type: All, Topic: All, filter by "RTClib", and install the latest version of "RTClib by Adafruit" (e.g. v2.0.2)
+From the Arduino IDE, access menu: Tools > Manage Libraries > Type: All, Topic: All, filter by "RTClib", and install the latest version of "RTClib by Adafruit" (e.g. v2.0.2)
 
 #### SdFat
 
@@ -46,25 +46,25 @@ From the Arduino IDE, access menu: Tools > Manage Libraries > Type: All, Topic: 
 
 Bounce2 (<https://www.arduino.cc/reference/en/libraries/bounce2/>) provides software debounce of the pushbutton switches on the OSEPP 16x2 Text LCD & Keypad Shield.
 
-* From the Arduino IDE, access menu: Tools > Manage Libraries > Type: All, Topic: All, filter by "Bounce2", and install the latest version of Bounce2 by Thomas O Fredericks (e.g. v2.71.2)
+From the Arduino IDE, access menu: Tools > Manage Libraries > Type: All, Topic: All, filter by "Bounce2", and install the latest version of Bounce2 by Thomas O Fredericks (e.g. v2.71.2)
 
 #### LiquidCrystal
 
 LiquidCrystal (<https://www.arduino.cc/reference/en/libraries/liquidcrystal/>) provides low-level access to the LCD display on the OSEPP 16x2 Text LCD & Keypad Shield. *This library may already have been installed with the Arduino IDE**
 
-* From the Arduino IDE, access menu Tools > Manage Libraries > Type: All, Topic: All, filter by "lcd", and install the latest version of LiquidCrystal by Arduino, Adafruit (e.g. v1.0.7)
+From the Arduino IDE, access menu Tools > Manage Libraries > Type: All, Topic: All, filter by "lcd", and install the latest version of LiquidCrystal by Arduino, Adafruit (e.g. v1.0.7)
 
 #### LCDKeypad
 
 LCDKeypad provides an object oriented library for interaction with the pushbutton switches and LCD on the OSEPP 16x2 Text LCD & Keypad Shield.
 
-* Download LCDKeypad.zip from <https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield>, and extract the LCDKeypad directory to \~/Arduino/libraries
+Download LCDKeypad.zip from <https://osepp.com/electronic-modules/shields/45-16-2-lcd-display-keypad-shield>, and extract the LCDKeypad directory to \~/Arduino/libraries
 
 #### ModbusMaster
 
 ModbusMaster (<https://www.arduino.cc/reference/en/libraries/modbusmaster/>) is the communication protocol stack to access to the Catnip RS485 Modbus Soil Moisture Sensors.
 
-* From the Arduino IDE, access menu: Tools > Manage Libraries > Type: All, Topic: All, filter by "ModbusMaster", and install the latest version of ModbusMaster by Doc Walker 4-20mA@wvfans.net (e.g. v2.0.1)
+From the Arduino IDE, access menu: Tools > Manage Libraries > Type: All, Topic: All, filter by "ModbusMaster", and install the latest version of ModbusMaster by Doc Walker 4-20mA@wvfans.net (e.g. v2.0.1)
 
 
 ### Usage
