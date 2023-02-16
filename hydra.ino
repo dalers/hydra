@@ -27,7 +27,9 @@
 
 bool logging = false;               // logging state - true if logging
 uint16_t samples = 1;               // sample counter, uint16_t = 45d @ 1min sample period
-uint8_t r;	                        // Modbus read status
+uint8_t r;                          // Modbus read status
+char logfname[25] = "";             // 8.3 log file name (.csv prefix will be hard-coded)
+//char logfname[8] = "";              // 8.3 log file name (.csv prefix will be hard-coded)
 
 SoftwareSerial softSerial(2, 3);    // Pin 2 = RX, Pin 3 = TX
 Bounce button = Bounce();
@@ -51,8 +53,8 @@ void postTransmission() {
 }
 
 // log sample period
-long logMillis = 60000;           // log period in ms (1min=60000, 5min=300000, 10min=600000, 1hr=3600000)
-long prevLogMillis = 0;           // millis of last log sample
+long logMillis = 60000;             // log period in ms (1min=60000, 5min=300000, 10min=600000, 1hr=3600000)
+long prevLogMillis = 0;             // millis of last log sample
 
 // ***********************************
 // SETUP
@@ -191,6 +193,9 @@ void loop() {
       lcd.print(F("Stop Logging  >R"));
       // write header to logfile
       // TODO generate log filename using current date/time e.g. "ddhhmmss.csv"
+      DateTime now = rtc.now();
+      sprintf(logfname, "%04d/%02d/%02d, %02d:%02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
+      
       File logfile = sd.open("logfile.csv", FILE_WRITE);
       logfile.println(F("DateTime,ID,S1-M,S1-T,S2-M,S2-T,S3-M,S3-T"));
       logfile.close();
