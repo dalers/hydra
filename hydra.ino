@@ -27,7 +27,7 @@
 
 bool logging = false;               // logging state - true if logging
 uint16_t samples = 1;               // sample counter, uint16_t = 45d @ 1min sample period
-uint8_t r;	                        // Modbus read status
+uint8_t r;                          // Modbus read status
 
 SoftwareSerial softSerial(2, 3);    // Pin 2 = RX, Pin 3 = TX
 Bounce button = Bounce();
@@ -51,8 +51,8 @@ void postTransmission() {
 }
 
 // log sample period
-long logMillis = 60000;           // log period in ms (1min=60000, 5min=300000, 10min=600000, 1hr=3600000)
-long prevLogMillis = 0;           // millis of last log sample
+long logMillis = 60000;             // log period in ms (1min=60000, 5min=300000, 10min=600000, 1hr=3600000)
+long prevLogMillis = 0;             // millis of last log sample
 
 // ***********************************
 // SETUP
@@ -276,7 +276,10 @@ void loop() {
       logfile.print(temperature);
       logfile.print(F(","));
     } else {
-      // TODO write null fields if read failure
+      Serial.print(F(","));
+      Serial.print(F(","));
+      logfile.print(F(","));
+      logfile.print(F(","));
     }
     delay(200);                                 // sensors need delay before next read
       
@@ -302,7 +305,10 @@ void loop() {
       logfile.print(temperature);
       logfile.print(F(","));
     } else {
-      // TODO write null fields if read failure
+      Serial.print(F(","));
+      Serial.print(F(","));
+      logfile.print(F(","));
+      logfile.print(F(","));
     }
     delay(200);                                 // sensors need delay before next read
       
@@ -316,17 +322,18 @@ void loop() {
       moisture = sensor.getResponseBuffer(0);
       temperature = sensor.getResponseBuffer(1);
       
-      // output Sensor 3 sample to serial port
+      // output Sensor 3 sample to serial port, end sample record with CRLF
       Serial.print(moisture);
       Serial.print(F(","));
-      Serial.println(temperature);               // end sample record with CRLF
+      Serial.println(temperature);
 
-      // write Sensor 3 sample to logfile
+      // write Sensor 3 sample to logfile, end record with CRLF
       logfile.print(moisture);
       logfile.print(F(","));
-      logfile.println(temperature);              // end sample record with CRLF
+      logfile.println(temperature);
     } else {
-      // TODO write null fields if read failure
+      Serial.println(F(","));
+      logfile.println(F(","));
     }
 
     // finished writing sample record, close logfile
