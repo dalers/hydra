@@ -281,7 +281,10 @@ void loop() {
       logfile.print(temperature);
       logfile.print(F(","));
     } else {
-      // TODO write null fields if read failure
+      Serial.print(F(","));
+      Serial.print(F(","));
+      logfile.print(F(","));
+      logfile.print(F(","));
     }
     delay(200);                                 // sensors need delay before next read
       
@@ -307,7 +310,10 @@ void loop() {
       logfile.print(temperature);
       logfile.print(F(","));
     } else {
-      // TODO write null fields if read failure
+      Serial.print(F(","));
+      Serial.print(F(","));
+      logfile.print(F(","));
+      logfile.print(F(","));
     }
     delay(200);                                 // sensors need delay before next read
       
@@ -321,17 +327,18 @@ void loop() {
       moisture = sensor.getResponseBuffer(0);
       temperature = sensor.getResponseBuffer(1);
       
-      // output Sensor 3 sample to serial port
+      // output Sensor 3 sample to serial port, end sample record with CRLF
       Serial.print(moisture);
       Serial.print(F(","));
-      Serial.println(temperature);               // end sample record with CRLF
+      Serial.println(temperature);
 
-      // write Sensor 3 sample to logfile
+      // write Sensor 3 sample to logfile, end record with CRLF
       logfile.print(moisture);
       logfile.print(F(","));
-      logfile.println(temperature);              // end sample record with CRLF
+      logfile.println(temperature);
     } else {
-      // TODO write null fields if read failure
+      Serial.println(F(","));
+      logfile.println(F(","));
     }
 
     // finished writing sample record, close logfile
