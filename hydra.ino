@@ -29,8 +29,8 @@ bool selfTestPass = true;           // startup self test status - true if pass
 bool logging = false;               // logging state - true if logging
 uint16_t samples = 1;               // sample counter, uint16_t = 45d @ 1min sample period
 uint8_t r;                          // Modbus read status
-char logfname[25] = "";             // 8.3 log file name (.csv prefix will be hard-coded)
-//char logfname[8] = "";              // 8.3 log file name (.csv prefix will be hard-coded)
+char longLogFname[25] = "";         // TODO delete when dev completed
+char logFname[8] = "";              // 8.3 log file name (.csv prefix will be hard-coded)
 
 SoftwareSerial softSerial(2, 3);    // Pin 2 = RX, Pin 3 = TX
 Bounce button = Bounce();
@@ -194,12 +194,13 @@ void loop() {
     if (logging == true) {
       lcd.setCursor(0,1);
       lcd.print(F("Stop Logging  >R"));
-      // write header to logfile
-      // TODO generate log filename using current date/time e.g. "ddhhmmss.csv"
+
+      // TODO generate log filename based on date/time
       DateTime now = rtc.now();
-      sprintf(logfname, "%04d/%02d/%02d, %02d:%02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
+      sprintf(longLogFname, "%04d/%02d/%02d, %02d:%02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
+      Serial.print(F("#Log Filename: ")); Serial.println(longLogFname);
       
-      File logfile = sd.open("logfile.csv", FILE_WRITE);
+      File logfile = sd.open("logfile.csv", FILE_WRITE);    // write header to logfile
       logfile.println(F("DateTime,ID,S1-M,S1-T,S2-M,S2-T,S3-M,S3-T"));
       logfile.close();
 
