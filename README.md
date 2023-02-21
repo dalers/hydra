@@ -3,10 +3,10 @@
 Hydra is a soil moisture monitor and data logger.
 
 * [Source License (2-Clause BSD)](doc/LICENSE.md)
-* [Contribution Guidelines](doc/CONTRIBUTING.md)
+* [Contribution Guidelines](doc/CONTRIBUTING.md
 * [Code of Conduct](doc/CODE_OF_CONDUCT.md)
 
-Hydra Data Logger:
+Hydra Data Logger Hardware Stack:
 
 * [Arduino Uno R3](https://store.arduino.cc/products/arduino-uno-rev3)
 * [Adafruit Data Logging Shield](https://www.adafruit.com/product/1141)
@@ -16,6 +16,16 @@ Hydra Data Logger:
 Hydra RS485 Modbus Moisture Sensor:
 
 * [Catnip Electronics Modbus RS485 Soil Moisture Sensor](https://www.tindie.com/products/miceuz/modbus-rs485-soil-moisture-sensor-2/). The Hydra source is currently hard-coded for three moisture sensors, which must be pre-configured as Modbus ID 1, 2 and 3.
+
+## Support
+
+Thank you for your interest in the Hydra project.
+
+Please use [Discussions](https://github.com/dalers/hydra/discussions) to discuss or ask questions related to Hydra development and use.
+
+If you find a software defect (bug), please enter it in [Issues](https://github.com/dalers/hydra/issues).
+
+Pull Requests are welcome, but please present the need for your Pull Request first either in [Discussions](https://github.com/dalers/hydra/discussions) (for feature enhancements), or in [Issues](https://github.com/dalers/hydra/issues) (to correct software defects).
 
 ## Getting Started
 
