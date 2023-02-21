@@ -29,8 +29,7 @@ bool selfTestPass = true;           // startup self test status - true if pass
 bool logging = false;               // logging state - true if logging
 uint16_t samples = 1;               // sample counter, uint16_t = 45d @ 1min sample period
 uint8_t r;                          // Modbus read status
-char longLogFname[25] = "";         // TODO delete when dev completed
-char logFname[8] = "";              // 8.3 log file name (.csv prefix will be hard-coded)
+char logFname[13] = "";             // 8.3 file name plus null end-of-string
 
 SoftwareSerial softSerial(2, 3);    // Pin 2 = RX, Pin 3 = TX
 Bounce button = Bounce();
@@ -195,12 +194,16 @@ void loop() {
       lcd.setCursor(0,1);
       lcd.print(F("Stop Logging  >R"));
 
-      // TODO generate log filename based on date/time
+      // generate log filename based on date/time (resolution is days, which will roll-over
+      // every month, however seconds will make fname collision _unlikely_ (but not impossible)
+      // TODO use seconds since Jan 1, 2023 (8 digits will give 3.1 years before roll over).
+      //   i.e. logFname = unix_time now - 2023-01-01T00:00:00
       DateTime now = rtc.now();
-      sprintf(longLogFname, "%04d/%02d/%02d, %02d:%02d:%02d", now.year(), now.month(), now.day(), now.hour(), now.minute(), now.second());
-      Serial.print(F("#Log Filename: ")); Serial.println(longLogFname);
+      sprintf(logFname, "%02d%02d%02d%02d.csv", now.day(), now.hour(), now.minute(), now.second());
+      Serial.print(F("#Log Filename: ")); Serial.println(logFname);
       
-      File logfile = sd.open("logfile.csv", FILE_WRITE);    // write header to logfile
+      // write header to logfile
+      File logfile = sd.open(logFname, FILE_WRITE);
       logfile.println(F("DateTime,ID,S1-M,S1-T,S2-M,S2-T,S3-M,S3-T"));
       logfile.close();
 
@@ -237,10 +240,10 @@ void loop() {
     Serial.print(F(","));
 	
     // open logfile to write new sample record
-    File logfile = sd.open("logfile.csv", FILE_WRITE);
+    File logfile = sd.open(logFname, FILE_WRITE);
     
     // write current date/time to logfile
-    // TODO write 2 digit month/day (currently writes 1 digit if < 10)
+    // TODO use printf for 2 digit month & day (currently writes 1 digit if < 10)
     logfile.print(now.year(), DEC);
     logfile.print(F("/"));
     logfile.print(now.month(), DEC);
@@ -259,7 +262,6 @@ void loop() {
     Serial.print(F(","));
 
     // write sample index to log file
-    //File logfile = sd.open("logfile.txt", FILE_WRITE);
     logfile.print(samples);
     logfile.print(F(","));
 	

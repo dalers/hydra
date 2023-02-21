@@ -1,9 +1,9 @@
 ## **Hydra**
 
-Hydra is a soil moisture monitor and data logger.
+Hydra is a soil moisture data logger.
 
 * [Source License (2-Clause BSD)](doc/LICENSE.md)
-* [Contribution Guidelines](doc/CONTRIBUTING.md
+* [Contribution Guidelines](doc/CONTRIBUTING.md)
 * [Code of Conduct](doc/CODE_OF_CONDUCT.md)
 
 Hydra Data Logger Hardware Stack:
@@ -15,7 +15,7 @@ Hydra Data Logger Hardware Stack:
 
 Hydra RS485 Modbus Moisture Sensor:
 
-* [Catnip Electronics Modbus RS485 Soil Moisture Sensor](https://www.tindie.com/products/miceuz/modbus-rs485-soil-moisture-sensor-2/). The Hydra source is currently hard-coded for three moisture sensors, which must be pre-configured as Modbus ID 1, 2 and 3.
+* [Catnip Electronics Modbus RS485 Soil Moisture Sensor](https://www.tindie.com/products/miceuz/modbus-rs485-soil-moisture-sensor-2/). **Hydra is currently hard-coded for three moisture sensors, which must be pre-configured as Modbus ID 1, 2 and 3.**
 
 ## Support
 
