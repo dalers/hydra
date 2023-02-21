@@ -25,6 +25,7 @@
 
 #define DRIVER_ENABLE A1            // RS-485 transceiver direction
 
+bool selfTestPass = true;           // startup self test status - true if pass
 bool logging = false;               // logging state - true if logging
 uint16_t samples = 1;               // sample counter, uint16_t = 45d @ 1min sample period
 uint8_t r;                          // Modbus read status
@@ -71,8 +72,8 @@ void setup() {
 
   // show starting up on LCD
   lcd.begin(16, 2);
-  lcd.clear();                      // sets cursor to (col 0, row 0)
-  lcd.print(F("Hydra Controller"));
+  lcd.clear();                      // leaves cursor at row/col (0,0)
+  lcd.print(F("Hydra"));
   lcd.setCursor(0,1);
   lcd.print(F("FW 0.0.4"));
   delay(2000);                      // display fw version for 2+ seconds
@@ -83,7 +84,7 @@ void setup() {
     
     if (! rtc.initialized() || rtc.lostPower()) {
       Serial.println(F("#RTC NOT initialized"));
-      // TODO manage RTC not initialized
+      selfTestPass = false;
     } else {
       DateTime now = rtc.now();
       Serial.print(F("#RTC time "));
@@ -102,7 +103,7 @@ void setup() {
     }
   } else {
     Serial.println(F("#RTC NOT found"));
-    // TODO set flag if RTC not found
+    selfTestPass = false;
   }
 
   // Probe SD Card
@@ -110,7 +111,7 @@ void setup() {
     Serial.println(F("#SD Card found"));
   } else {
     Serial.println(F("#SD Card NOT found"));
-    // TODO set flag if SD Card not found
+    selfTestPass = false;
   }
 
   // Probe Moisture Sensor 1
@@ -126,7 +127,7 @@ void setup() {
     Serial.println(sensor.getResponseBuffer(1));
   } else {
     Serial.println(F("#Sensor 1 NOT found"));
-    // TODO set flag if sensor 1 not found
+    selfTestPass = false;
   }
   delay(200);                                 // sensors need delay before next read
     
@@ -143,7 +144,7 @@ void setup() {
     Serial.println(sensor.getResponseBuffer(1));
   } else {
     Serial.println(F("#Sensor 2 NOT found"));
-    // TODO set flag if sensor 2 not found
+    selfTestPass = false;
   }
   delay(200);                                 // sensors need delay before next read
 	  
@@ -160,15 +161,17 @@ void setup() {
     Serial.println(sensor.getResponseBuffer(1));
   } else {
     Serial.println(F("#Sensor 3 NOT found"));
-    // TODO set flag if sensor 3 not found
+    selfTestPass = false;
   }
   delay(200);                                 // sensors need delay before next read (probably not needed here)
 	  
-  // startup complete, show logging prompt
+  // startup complete
+  Serial.print(F("#Startup Complete, selfTestPass: "));
+  Serial.println(selfTestPass);
+
+  // show prompt to start logging
   lcd.setCursor(0,1);
   lcd.print(F("Start Logging >R"));
-
-  Serial.println(F("#Startup Complete"));
 }
 
 // ***********************************
