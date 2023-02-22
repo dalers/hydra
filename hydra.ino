@@ -74,21 +74,16 @@ void setup() {
   // show starting up on LCD
   lcd.begin(16, 2);
   lcd.clear();                      // leaves cursor at row/col (0,0)
-  lcd.print(F("Hydra"));
-  lcd.setCursor(0,1);
-  lcd.print(F("FW 0.0.4"));
-  delay(2000);                      // display fw version for 2+ seconds
+  lcd.print(F("Hydra 0.0.5"));
   
   // Probe RTC
   if (rtc.begin()) {
-    Serial.println(F("#RTC found"));
-    
     if (! rtc.initialized() || rtc.lostPower()) {
-      Serial.println(F("#RTC NOT initialized"));
+      Serial.println(F("#RTC Found, RTC NOT initialized"));
       selfTestPass = false;
     } else {
       DateTime now = rtc.now();
-      Serial.print(F("#RTC time "));
+      Serial.print(F("#RTC Found, Time: "));
       Serial.print(now.year(), DEC);
       Serial.print(F("/"));
       Serial.print(now.month(), DEC);
@@ -103,15 +98,15 @@ void setup() {
       Serial.println();
     }
   } else {
-    Serial.println(F("#RTC NOT found"));
+    Serial.println(F("#RTC NOT Found"));
     selfTestPass = false;
   }
 
   // Probe SD Card
-  if(sd.begin (chipSelect, SPI_HALF_SPEED)) {
-    Serial.println(F("#SD Card found"));
+  if(sd.begin(chipSelect, SPI_HALF_SPEED)) {
+    Serial.println(F("#SD Card Found"));
   } else {
-    Serial.println(F("#SD Card NOT found"));
+    Serial.println(F("#SD Card NOT Found"));
     selfTestPass = false;
   }
 
@@ -122,12 +117,12 @@ void setup() {
 
   r = sensor.readInputRegisters(0, 3);
   if (0 == r) {
-    Serial.print(F("#Sensor 1 found. Moisture: "));
+    Serial.print(F("#Sensor 1 Found. Moisture: "));
     Serial.print(sensor.getResponseBuffer(0));
     Serial.print(F(", Temp: "));
     Serial.println(sensor.getResponseBuffer(1));
   } else {
-    Serial.println(F("#Sensor 1 NOT found"));
+    Serial.println(F("#Sensor 1 NOT Found"));
     selfTestPass = false;
   }
   delay(200);                                 // sensors need delay before next read
@@ -139,12 +134,12 @@ void setup() {
 
   r = sensor.readInputRegisters(0, 3);
   if (0 == r) {
-    Serial.print(F("#Sensor 2 found. Moisture: "));
+    Serial.print(F("#Sensor 2 Found. Moisture: "));
     Serial.print(sensor.getResponseBuffer(0));
     Serial.print(F(", Temp: "));
     Serial.println(sensor.getResponseBuffer(1));
   } else {
-    Serial.println(F("#Sensor 2 NOT found"));
+    Serial.println(F("#Sensor 2 NOT Found"));
     selfTestPass = false;
   }
   delay(200);                                 // sensors need delay before next read
@@ -156,18 +151,18 @@ void setup() {
 
   r = sensor.readInputRegisters(0, 3);
   if (0 == r) {
-    Serial.print(F("#Sensor 3 found. Moisture: "));
+    Serial.print(F("#Sensor 3 Found. Moisture: "));
     Serial.print(sensor.getResponseBuffer(0));
     Serial.print(F(", Temp: "));
     Serial.println(sensor.getResponseBuffer(1));
   } else {
-    Serial.println(F("#Sensor 3 NOT found"));
+    Serial.println(F("#Sensor 3 NOT Found"));
     selfTestPass = false;
   }
   delay(200);                                 // sensors need delay before next read (probably not needed here)
 	  
   // startup complete
-  Serial.print(F("#Startup Complete, selfTestPass: "));
+  Serial.print(F("#Startup Complete, Self Test: "));
   Serial.println(selfTestPass);
 
   // show prompt to start logging
@@ -351,6 +346,5 @@ void loop() {
     logfile.close();
 
     samples++;                                   // increment number of samples
-
   }
 }
