@@ -56,6 +56,11 @@ void postTransmission() {
 long logMillis = 60000;             // log period in ms (1min=60000, 5min=300000, 10min=600000, 1hr=3600000)
 long prevLogMillis = 0;             // millis of last log sample
 
+// logging heartbeat
+long hbMillis = 1000;               // heartbeat period in ms (1sec = 1000)
+long prevHbMillis = 0;              // millis of last heartbeat transition
+bool hbState = false;               // logging heartbeat state - true for "*"
+
 // ***********************************
 // SETUP
 // ***********************************
@@ -73,7 +78,7 @@ void setup() {
 
   // show starting up on LCD
   lcd.begin(16, 2);
-  lcd.clear();                      // leaves cursor at row/col (0,0)
+  lcd.clear();                      // leaves cursor at col/row (0,0)
   lcd.print(F("Hydra 0.0.5"));
   
   // Probe RTC
@@ -165,7 +170,7 @@ void setup() {
   Serial.print(F("#Startup Complete, Self Test: "));
   Serial.println(selfTestPass);
 
-  // show prompt to start logging
+  // show start logging prompt
   lcd.setCursor(0,1);
   lcd.print(F("Start Logging >R"));
 }
@@ -180,12 +185,13 @@ void loop() {
   
   button.update();
   if(button.fell()) {             // if RIGHT was pressed and released
-    Serial.println(F("#RIGHT pressed"));
+    Serial.println(F("#RIGHT Pressed"));
   
     logging = !(logging);
-    Serial.print(F("#Logging state: ")); Serial.println(logging);
+    Serial.print(F("#Logging State: ")); Serial.println(logging);
 
-    if (logging == true) {
+    if (logging == true) { // if logging started
+      // show stop logging prompt
       lcd.setCursor(0,1);
       lcd.print(F("Stop Logging  >R"));
 
@@ -202,7 +208,12 @@ void loop() {
       logfile.println(F("DateTime,ID,S1-M,S1-T,S2-M,S2-T,S3-M,S3-T"));
       logfile.close();
 
-    } else {
+    } else {  // if logging stopped
+      // turn heartbeat Off in case On
+      lcd.setCursor(15,0);
+      lcd.print(F(" "));
+      
+      // show start logging prompt
       lcd.setCursor(0,1);
       lcd.print(F("Start Logging >R"));
     }
@@ -212,6 +223,22 @@ void loop() {
   int16_t  temperature = 0;                // sensor temperature value
   uint8_t  r = 0;                          // sensor return value
   unsigned long currentMillis = millis();  // current sample time
+
+  if (logging && (currentMillis - prevHbMillis > hbMillis)) {
+    // save the last time the heartbeat transitioned 
+    prevHbMillis = currentMillis;
+    // if the heartbeat is off turn it on and vice-versa:
+    if (hbState == false) {
+      hbState = true;
+      lcd.setCursor(15,0);
+      lcd.print(F("*"));
+    }
+    else {
+      hbState= false;
+      lcd.setCursor(15,0);
+      lcd.print(F(" "));
+    }
+  }
 
   if (logging && (currentMillis - prevLogMillis > logMillis)) {
 
