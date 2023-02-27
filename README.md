@@ -75,8 +75,8 @@ From the Arduino IDE, access menu: Tools > Manage Libraries > Type: All, Topic: 
 
 ## Usage
 
-* Apply power to the Hydra Data Logger. If desired, connect a computer to the Hydra Data Logger USB port and monitor startup and operation using a terminal emulator (9600 baud, 8-bit, 1 stop bit, no parity).
-* When the logging prompt appears on the LCD, press the **RIGHT** button on the LCD Display and Keypad Shield to start logging.
+* Connect sensors to the data logger.
+* Apply power to the data logger. The LCD will display results of the startup self-test as performed: 1) Real-time clock (RTC), 2) SD Card, 3) Sensor 1, 4) Sensor 2, 5) Sensor 3. A startup error does not prevent logging (although, if the SD Card test fails there will be no log file).
+* When the logging prompt appears on the LCD, press the **RIGHT** button on the LCD Display and Keypad Shield to start logging. The log filename will be automatially generated based on the current date and time (ddmmhhmmss.csv). A star will blink at the top left of the LCD when logging.
 * When logging, press the **RIGHT** again to stop logging.
-* Disconnect power, remove the SD Card, and use an appropriate SD Card adapter to access the log file. **Hydra currently appends log data to file "logfile.csv"**
-
+* Disconnect power, remove the SD Card and access the log file on a computer using an SD Card reader.
