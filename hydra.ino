@@ -78,14 +78,16 @@ void setup() {
 
   // show starting up on LCD
   lcd.begin(16, 2);
-  lcd.clear();                      // leaves cursor at col/row (0,0)
-  lcd.print(F("Hydra 0.0.5"));
+  lcd.clear();                      // leaves cursor at (col,row) = (0,0)
+  lcd.print(F("Hydra 0.0.6"));
   
   // Probe RTC
   if (rtc.begin()) {
     if (! rtc.initialized() || rtc.lostPower()) {
-      Serial.println(F("#RTC Found, RTC NOT initialized"));
+      Serial.println(F("#RTC NOT Init"));
       selfTestPass = false;
+      lcd.setCursor(0,1); lcd.print(F("                "));
+      lcd.setCursor(0,1); lcd.print(F("#RTC NOT Init"));
     } else {
       DateTime now = rtc.now();
       Serial.print(F("#RTC Found, Time: "));
@@ -101,19 +103,31 @@ void setup() {
       Serial.print(F(":"));
       Serial.print(now.second(), DEC);
       Serial.println();
+      lcd.setCursor(0,1); lcd.print(F("                "));
+      lcd.setCursor(0,1); lcd.print(F("#RTC OK"));
     }
   } else {
     Serial.println(F("#RTC NOT Found"));
+    lcd.setCursor(0,1); lcd.print(F("                "));
+    lcd.setCursor(0,1); lcd.print(F("#RTC NOT Found"));
     selfTestPass = false;
   }
 
+  delay(1000);
+
   // Probe SD Card
   if(sd.begin(chipSelect, SPI_HALF_SPEED)) {
-    Serial.println(F("#SD Card Found"));
+    Serial.println(F("#SD Card OK"));
+    lcd.setCursor(0,1); lcd.print(F("                "));
+    lcd.setCursor(0,1); lcd.print(F("#SD Card OK"));
   } else {
     Serial.println(F("#SD Card NOT Found"));
+    lcd.setCursor(0,1); lcd.print(F("                "));
+    lcd.setCursor(0,1); lcd.print(F("#SD Card NOT OK"));
     selfTestPass = false;
   }
+
+  delay(1000);  // delay to read LCD
 
   // Probe Moisture Sensor 1
   sensor.begin(1, softSerial);
@@ -126,11 +140,16 @@ void setup() {
     Serial.print(sensor.getResponseBuffer(0));
     Serial.print(F(", Temp: "));
     Serial.println(sensor.getResponseBuffer(1));
+    lcd.setCursor(0,1); lcd.print(F("                "));
+    lcd.setCursor(0,1); lcd.print(F("#Sensor 1 OK"));
   } else {
-    Serial.println(F("#Sensor 1 NOT Found"));
+    Serial.println(F("#Sensor 1 NOT OK"));
+    lcd.setCursor(0,1); lcd.print(F("                "));
+    lcd.setCursor(0,1); lcd.print(F("#Sensor 1 NOT OK"));
     selfTestPass = false;
   }
-  delay(200);                                 // sensors need delay before next read
+
+  delay(1000);  // delay to read LCD (and delay before next sensor read)
     
   // Probe Moisture Sensor 2
   sensor.begin(2, softSerial);
@@ -143,11 +162,16 @@ void setup() {
     Serial.print(sensor.getResponseBuffer(0));
     Serial.print(F(", Temp: "));
     Serial.println(sensor.getResponseBuffer(1));
+    lcd.setCursor(0,1); lcd.print(F("                "));
+    lcd.setCursor(0,1); lcd.print(F("#Sensor 2 OK"));
   } else {
-    Serial.println(F("#Sensor 2 NOT Found"));
+    Serial.println(F("#Sensor 2 NOT OK"));
+    lcd.setCursor(0,1); lcd.print(F("                "));
+    lcd.setCursor(0,1); lcd.print(F("#Sensor 2 NOT OK"));
     selfTestPass = false;
   }
-  delay(200);                                 // sensors need delay before next read
+
+  delay(1000);  // delay to read LCD (and delay before next sensor read)
 	  
   // Probe Moisture Sensor 3
   sensor.begin(3, softSerial);
@@ -160,11 +184,16 @@ void setup() {
     Serial.print(sensor.getResponseBuffer(0));
     Serial.print(F(", Temp: "));
     Serial.println(sensor.getResponseBuffer(1));
+    lcd.setCursor(0,1); lcd.print(F("                "));
+    lcd.setCursor(0,1); lcd.print(F("#Sensor 3 OK"));
   } else {
-    Serial.println(F("#Sensor 3 NOT Found"));
+    Serial.println(F("#Sensor 3 NOT OK"));
+    lcd.setCursor(0,1); lcd.print(F("                "));
+    lcd.setCursor(0,1); lcd.print(F("#Sensor 3 NOT OK"));
     selfTestPass = false;
   }
-  delay(200);                                 // sensors need delay before next read (probably not needed here)
+
+  delay(1000);  // delay to read LCD (and delay before next sensor read)
 	  
   // startup complete
   Serial.print(F("#Startup Complete, Self Test: "));
